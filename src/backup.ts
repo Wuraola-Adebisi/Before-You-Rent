@@ -43,7 +43,7 @@ export function validateBackupPayload(value: unknown): string | null {
       seenNotes.push(note.id as string);
     }
     for (const photo of photos) {
-      if (!isText(photo.id) || photo.propertyId !== id || !isText(photo.name) || !isText(photo.mimeType) || !photo.mimeType.startsWith('image/') || !isText(photo.caption) || !validTimestamp(photo.createdAt) || !isText(photo.blob) || !/^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+\/]*={0,2}$/.test(photo.blob)) return 'A photo in the backup is invalid or belongs to another property.';
+      if (!isText(photo.id) || photo.propertyId !== id || !isText(photo.name) || !isText(photo.mimeType) || !photo.mimeType.startsWith('image/') || !isText(photo.caption) || (photo.includeInReport !== undefined && typeof photo.includeInReport !== 'boolean') || !validTimestamp(photo.createdAt) || !isText(photo.blob) || !/^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+\/]*={0,2}$/.test(photo.blob)) return 'A photo in the backup is invalid or belongs to another property.';
       seenPhotos.push(photo.id as string);
     }
   }

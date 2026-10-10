@@ -15,4 +15,4 @@ export const CHECKLIST = [
   { section: 'Before you commit', items: [{ id:'landlord-agent', label:'Landlord or agent authority and identity', help:'Ask who you are dealing with and request verifiable documentation.' },{ id:'agreement', label:'Tenancy agreement and key terms', help:'Review duration, renewal, notice, repairs, and termination terms.' },{ id:'fees', label:'Every fee and payment recipient explained', help:'Get a written breakdown and receipt details before paying.' },{ id:'repairs', label:'Repairs and outstanding work agreed in writing', help:'Record who will fix what and by which date.' }]},
 ];
 
-export type InspectionPhoto = { id: string; propertyId: string; name: string; mimeType: string; blob: Blob; caption: string; createdAt: string };
+export type InspectionPhoto = { id: string; propertyId: string; name: string; mimeType: string; blob: Blob; caption: string; createdAt: string; includeInReport?: boolean };

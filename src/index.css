@@ -297,3 +297,6 @@ p{font-size:16px;line-height:1.75}
 
 .create-form textarea{width:100%;min-height:84px;resize:vertical;border:1px solid #e3e2d9;background:#fff;border-radius:8px;padding:10px 11px;outline:none;font:400 12px/1.6 'DM Sans',sans-serif;color:#2d332b}
 .create-form textarea:focus{border-color:#78956e;box-shadow:0 0 0 3px #e8efe2}
+
+.evidence-report-toggle{display:flex;align-items:center;gap:7px;padding:8px 10px 10px;font-size:11px;line-height:1.4;color:#4c5748;border-top:1px solid #f0efe9}
+.evidence-report-toggle input{width:16px;height:16px;accent-color:#294d3b;flex-shrink:0}
