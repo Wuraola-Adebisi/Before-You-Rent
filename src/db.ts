@@ -58,9 +58,16 @@ export async function importBackupData(
       for (const note of detail.notes) writes.push(tx.objectStore('notes').put(note));
       for (const photo of detail.photos) writes.push(tx.objectStore('photos').put(photo));
     }
-    await Promise.all([...writes, tx.done]);
+    const completion = tx.done.then(
+      () => ({ ok: true as const }),
+      error => ({ ok: false as const, error }),
+    );
+    const results = await Promise.allSettled(writes);
+    const outcome = await completion;
+    const failedWrite = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+    if (!outcome.ok) throw failedWrite?.reason ?? outcome.error;
+    if (failedWrite) throw failedWrite.reason;
   } catch (error) {
-    try { tx.abort(); } catch { /* The transaction may already have aborted. */ }
     throw error;
   }
 }
