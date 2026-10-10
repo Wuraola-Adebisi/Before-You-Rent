@@ -45,9 +45,9 @@ function WorkspaceApp() {
       const params = new URLSearchParams(window.location.search);
       const requestedView = params.get('view');
       const validViews: View[] = ['overview', 'properties', 'inspection', 'costs', 'compare', 'settings'];
-      if (requestedView && validViews.includes(requestedView as View)) setView(requestedView as View);
+      setView(requestedView && validViews.includes(requestedView as View) ? requestedView as View : 'overview');
       const requestedProperty = params.get('property');
-      if (requestedProperty) setActiveId(requestedProperty);
+      setActiveId(requestedProperty || '');
     };
     readLocation();
     const handlePopState = () => readLocation();
