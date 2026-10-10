@@ -38,9 +38,7 @@ export default function App() {
   useEffect(() => {
     if (!activeId) { setAnswers([]); return; }
     let cancelled = false;
-    Promise.all([getAnswers(activeId), getCosts(activeId), getNotes(activeId)]).then(([a,c,n]) => {
-      if (!cancelled) { setAnswers(a); setCostTotal(c.reduce((sum, item) => sum + item.amount, 0));  }
-    }).catch(() => setError('Could not load inspection details from this browser.'));
+    getAnswers(activeId).then(a => { if (!cancelled) setAnswers(a); }).catch(() => setError('Could not load inspection details from this browser.'));
     return () => { cancelled = true; };
   }, [activeId, properties]);
   const allItems = CHECKLIST.flatMap(section => section.items);
