@@ -265,3 +265,20 @@ p{font-size:16px;line-height:1.75}
 .danger-zone{margin-top:28px;padding-top:22px;border-top:1px solid #f0d7d1}
 .danger-zone h3{margin:0 0 8px;font-size:16px}.danger-zone p{font-size:14px;color:var(--muted);line-height:1.65}
 .danger-action{border-color:#c66b5b!important;color:#9c3428!important}
+
+/* Printable inspection record */
+.print-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0}
+.print-meta>span{display:flex;flex-direction:column;gap:4px;padding:9px;border:1px solid #ddd;border-radius:6px;font-size:12px}
+.print-meta b{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#555}
+.print-section{margin:20px 0;break-inside:auto}
+.print-section h2{font-size:15px;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid #ccc}
+.print-item{display:flex;justify-content:space-between;gap:20px;padding:7px 0;border-bottom:1px solid #eee;font-size:11px}
+.print-item>span{flex:1}.print-item>b{text-align:right;max-width:42%}
+.print-item-with-note small{display:block;margin-top:4px;color:#555}
+.print-note{padding:9px 0;border-bottom:1px solid #eee;font-size:12px}.print-note p{margin:5px 0;font-size:12px}.print-note small{color:#555}
+.print-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.print-photo{margin:0;break-inside:avoid;border:1px solid #ddd;padding:6px}
+.print-photo img{width:100%;max-height:230px;object-fit:contain;display:block}
+.print-photo figcaption{font-size:10px;padding:5px 0;overflow-wrap:anywhere}
+@media print{.print-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.print-section{break-inside:auto}.print-item,.print-note{break-inside:avoid}}
+@media(max-width:640px){.print-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
