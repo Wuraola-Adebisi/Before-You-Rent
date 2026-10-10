@@ -42,6 +42,17 @@ function WorkspaceApp() {
   useEffect(() => { void refresh(); }, []);
   useEffect(() => { if (new URLSearchParams(window.location.search).get('start') === 'property') setShowCreate(true); }, []);
   useEffect(() => {
+    if (!showCreate) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowCreate(false);
+        setEditingProperty(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreate]);
+  useEffect(() => {
     if (!activeId) { setAnswers([]); return; }
     let cancelled = false;
     getAnswers(activeId).then(a => { if (!cancelled) setAnswers(a); }).catch(() => setError('Could not load inspection details from this browser.'));
