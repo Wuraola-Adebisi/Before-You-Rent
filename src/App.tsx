@@ -256,7 +256,7 @@ function SettingsView({onExport,onImport,count}:{onExport:()=>void;onImport:(fil
 
 
 export default function App() {
-  const path = window.location.pathname.replace(/\\/+$/, '') || '/';
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
   if (path === '/app' || path.startsWith('/app/')) return <WorkspaceApp />;
   return <MarketingSite path={path} />;
 }
