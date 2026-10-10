@@ -42,3 +42,26 @@ export async function removeNote(id: string) { return (await dbPromise).delete('
 export async function getPhotos(id: string) { return (await dbPromise).getAllFromIndex('photos','by-property',id); }
 export async function savePhoto(value: InspectionPhoto) { return (await dbPromise).put('photos', value); }
 export async function removePhoto(id: string) { return (await dbPromise).delete('photos', id); }
+
+export async function importBackupData(
+  properties: PropertyRecord[],
+  details: Array<{ id: string; answers: InspectionAnswer[]; costs: PropertyCost[]; notes: InspectionNote[]; photos: InspectionPhoto[] }>,
+) {
+  const db = await dbPromise;
+  const tx = db.transaction(['properties', 'answers', 'costs', 'notes', 'photos'], 'readwrite');
+  try {
+    const writes: Promise<unknown>[] = [];
+    for (const property of properties) writes.push(tx.objectStore('properties').put(property));
+    for (const detail of details) {
+      for (const answer of detail.answers) writes.push(tx.objectStore('answers').put(answer));
+      for (const cost of detail.costs) writes.push(tx.objectStore('costs').put(cost));
+      for (const note of detail.notes) writes.push(tx.objectStore('notes').put(note));
+      for (const photo of detail.photos) writes.push(tx.objectStore('photos').put(photo));
+    }
+    await Promise.all(writes);
+    await tx.done;
+  } catch (error) {
+    try { tx.abort(); } catch { /* The transaction may already have aborted. */ }
+    throw error;
+  }
+}

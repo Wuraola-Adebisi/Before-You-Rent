@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { Camera, ImagePlus, ArrowDownRight, ArrowLeft, ArrowRight, Banknote, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, CircleHelp, ClipboardCheck, Clock3, FileText, Home, House, ListChecks, MapPin, Menu, Plus, Search, ShieldCheck, SlidersHorizontal, Sparkles, Trash2, Wallet, X } from 'lucide-react';
-import { deleteAllData, deleteProperty, getAnswers, getCosts, getNotes, getPhotos, getProperties, removeCost, removeNote, removePhoto, saveAnswer, saveCost, saveNote, savePhoto, saveProperty } from './db';
+import { deleteAllData, deleteProperty, getAnswers, getCosts, getNotes, getPhotos, getProperties, importBackupData, removeCost, removeNote, removePhoto, saveAnswer, saveCost, saveNote, savePhoto, saveProperty } from './db';
 import { CHECKLIST, type CheckStatus, type InspectionAnswer, type InspectionNote, type InspectionPhoto, type PropertyCost, type PropertyRecord } from './types';
 import MarketingSite from './MarketingSite';
 import { rentMonthlyEquivalent, rentPeriodLabel, summarizeCosts } from './finance';
@@ -97,17 +97,14 @@ function WorkspaceApp() {
       const validationError = validateBackupPayload(parsed);
       if (validationError) throw new Error(validationError);
       if (!window.confirm('Import ' + parsed.properties.length + ' properties? This merges the backup into this browser. Matching IDs will be overwritten; unrelated records will remain. Photo evidence is included.')) return;
-      for (const property of parsed.properties) await saveProperty(property);
-      for (const detail of parsed.details) {
-        if (!detail || typeof detail.id !== 'string') continue;
-        for (const answer of detail.answers ?? []) await saveAnswer(answer);
-        for (const cost of detail.costs ?? []) await saveCost(cost);
-        for (const note of detail.notes ?? []) await saveNote(note);
-        for (const photo of detail.photos ?? []) {
-          if (typeof photo.blob !== 'string') throw new Error('A photo in this backup is invalid.');
-          await savePhoto({...photo, blob:dataUrlToBlob(photo.blob)});
-        }
-      }
+      const restoredDetails = parsed.details.map(detail => ({
+        id: detail.id,
+        answers: detail.answers,
+        costs: detail.costs,
+        notes: detail.notes,
+        photos: detail.photos.map(photo => ({ ...photo, blob: dataUrlToBlob(photo.blob) })),
+      }));
+      await importBackupData(parsed.properties, restoredDetails);
       await refresh();
       setToast('Backup imported. Review the merged records before relying on them.');
       window.setTimeout(() => setToast(''), 3500);
@@ -127,13 +124,15 @@ function WorkspaceApp() {
         photos: await Promise.all((await getPhotos(property.id)).map(async photo => ({...photo, blob: await blobToDataUrl(photo.blob)}))),
       })));
       const payload = { schemaVersion: 1, exportedAt: new Date().toISOString(), properties: records, details };
-      const url = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+      const backupBlob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      if (backupBlob.size > 50 * 1024 * 1024) throw new Error('Backup exceeds the 50 MB import limit. Remove or reduce large photos, then export again.');
+      const url = URL.createObjectURL(backupBlob);
       const a = document.createElement('a'); a.href = url; a.download = 'before-you-rent-backup.json'; a.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setToast('Backup created. Keep it somewhere private and secure.');
       window.setTimeout(() => setToast(''), 3500);
-    } catch {
-      setError('Export failed. Your browser may not have enough memory to package the selected records and photos.');
+    } catch (e) {
+      setError(e instanceof Error ? 'Export failed: ' + e.message : 'Export failed. Your browser may not have enough memory to package the selected records and photos.');
     }
   }
 
