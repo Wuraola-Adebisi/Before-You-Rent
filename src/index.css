@@ -294,3 +294,6 @@ p{font-size:16px;line-height:1.75}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.create-form textarea{width:100%;min-height:84px;resize:vertical;border:1px solid #e3e2d9;background:#fff;border-radius:8px;padding:10px 11px;outline:none;font:400 12px/1.6 'DM Sans',sans-serif;color:#2d332b}
+.create-form textarea:focus{border-color:#78956e;box-shadow:0 0 0 3px #e8efe2}
