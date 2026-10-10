@@ -129,7 +129,7 @@ function WorkspaceApp() {
 
   return <div className="app-shell">
     <aside className={'sidebar ' + (mobileNav ? 'sidebar-open' : '')}>
-      <button className="brand" onClick={() => navigate('overview')} aria-label="Before You Rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">Before You <b>Rent.</b></span></button>
+      <button className="brand" onClick={() => navigate('overview')} aria-label="Before You Rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">Before you <b>rent.</b></span></button>
       <div className="workspace-label">WORKSPACE</div>
       <nav className="nav-list" aria-label="Main navigation">
         <NavItem active={view === 'overview'} icon={<Home size={18}/>} label="Overview" onClick={() => navigate('overview')}/>
