@@ -58,8 +58,7 @@ export async function importBackupData(
       for (const note of detail.notes) writes.push(tx.objectStore('notes').put(note));
       for (const photo of detail.photos) writes.push(tx.objectStore('photos').put(photo));
     }
-    await Promise.all(writes);
-    await tx.done;
+    await Promise.all([...writes, tx.done]);
   } catch (error) {
     try { tx.abort(); } catch { /* The transaction may already have aborted. */ }
     throw error;
