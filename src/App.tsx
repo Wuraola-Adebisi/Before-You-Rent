@@ -40,6 +40,20 @@ function WorkspaceApp() {
     } finally { setLoading(false); }
   }
   useEffect(() => { void refresh(); }, []);
+  useEffect(() => {
+    const readLocation = () => {
+      const params = new URLSearchParams(window.location.search);
+      const requestedView = params.get('view');
+      const validViews: View[] = ['overview', 'properties', 'inspection', 'costs', 'compare', 'settings'];
+      if (requestedView && validViews.includes(requestedView as View)) setView(requestedView as View);
+      const requestedProperty = params.get('property');
+      if (requestedProperty) setActiveId(requestedProperty);
+    };
+    readLocation();
+    const handlePopState = () => readLocation();
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   useEffect(() => { if (new URLSearchParams(window.location.search).get('start') === 'property') setShowCreate(true); }, []);
   useEffect(() => {
     if (!showCreate) return;
@@ -99,8 +113,24 @@ function WorkspaceApp() {
     try { await deleteProperty(active.id); setActiveId(''); await refresh(); setView('properties'); }
     catch { setError('The property could not be deleted.'); }
   }
-  function navigate(next: View) { setView(next); setMobileNav(false); }
-  function startInspection(property: PropertyRecord) { setActiveId(property.id); setView('inspection'); }
+  function navigate(next: View, propertyId = activeId) {
+    setView(next);
+    setMobileNav(false);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('start');
+    url.searchParams.set('view', next);
+    if (propertyId) url.searchParams.set('property', propertyId);
+    else url.searchParams.delete('property');
+    window.history.pushState({ byrView: next, byrProperty: propertyId || null }, '', url);
+  }
+  function goBack() {
+    if (window.history.state?.byrView) window.history.back();
+    else navigate('overview');
+  }
+  function startInspection(property: PropertyRecord) {
+    setActiveId(property.id);
+    navigate('inspection', property.id);
+  }
   function startCreate() { setEditingProperty(null); setRentDurationDraft('year'); setShowCreate(true); }
   function startEdit(property: PropertyRecord) { setEditingProperty(property); setRentDurationDraft(property.rentDuration); setShowCreate(true); }
   async function importData(file: File) {
@@ -151,7 +181,7 @@ function WorkspaceApp() {
 
   return <div className="app-shell">
     <aside className={'sidebar ' + (mobileNav ? 'sidebar-open' : '')}>
-      <button className="brand" onClick={() => navigate('overview')} aria-label="Before You Rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">Before you <b>rent.</b></span></button>
+      <a className="brand" href="/" aria-label="Before you rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">Before you <b>rent.</b></span></a>
       <div className="workspace-label">WORKSPACE</div>
       <nav className="nav-list" aria-label="Main navigation">
         <NavItem active={view === 'overview'} icon={<Home size={18}/>} label="Overview" onClick={() => navigate('overview')}/>
@@ -168,7 +198,7 @@ function WorkspaceApp() {
     </aside>
     {mobileNav && <button className="mobile-scrim" onClick={() => setMobileNav(false)} aria-label="Close navigation"/>}
     <main className="main-area">
-      <header className="topbar"><button className="mobile-menu icon-button" onClick={() => setMobileNav(!mobileNav)} aria-label="Open menu"><Menu size={21}/></button><div className="breadcrumb">Your space <span>/</span> <b>{viewLabels[view]}</b></div><div className="topbar-right"><button className="avatar" title="Workspace">BYR</button></div></header>
+      <header className="topbar"><button className="mobile-menu icon-button" onClick={() => setMobileNav(!mobileNav)} aria-label="Open menu"><Menu size={21}/></button><button className="workspace-back" onClick={goBack} aria-label="Go back to previous view"><ArrowLeft size={16}/><span>Back</span></button><div className="breadcrumb">Your space <span>/</span> <b>{viewLabels[view]}</b></div><div className="topbar-right"><a className="home-shortcut" href="/" aria-label="Go to public homepage"><House size={16}/><span>Home</span></a><button className="avatar" title="Workspace">BYR</button></div></header>
       <div className="page-content">
         {error && <div className="alert-error" role="alert"><CircleHelp size={17}/><span>{error}</span><button onClick={() => setError('')} aria-label="Dismiss error"><X size={16}/></button></div>}
         {loading ? <div className="loading-state"><div className="loader"/><p>Opening your workspace…</p></div> : <>

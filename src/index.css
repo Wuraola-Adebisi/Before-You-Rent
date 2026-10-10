@@ -300,3 +300,19 @@ p{font-size:16px;line-height:1.75}
 
 .evidence-report-toggle{display:flex;align-items:center;gap:7px;padding:8px 10px 10px;font-size:11px;line-height:1.4;color:#4c5748;border-top:1px solid #f0efe9}
 .evidence-report-toggle input{width:16px;height:16px;accent-color:#294d3b;flex-shrink:0}
+
+/* Workspace navigation: consistent back, forward and home access */
+.brand{ text-decoration:none; cursor:pointer; }
+.workspace-back{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid #e5e5dc;border-radius:9px;background:#fff;color:#4b5948;font-size:11px;font-weight:650;white-space:nowrap}
+.workspace-back:hover,.home-shortcut:hover{background:#edf2e8;color:#294d3b}
+.home-shortcut{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid #e5e5dc;border-radius:9px;background:#fff;color:#4b5948;text-decoration:none;font-size:11px;font-weight:650;white-space:nowrap}
+.topbar{gap:12px}
+.topbar-right{margin-left:auto}
+@media(max-width:760px){
+ .topbar{padding:0 16px;gap:9px}
+ .workspace-back{min-width:36px;width:36px;padding:0}
+ .workspace-back span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ .home-shortcut{min-width:36px;width:36px;padding:0}
+ .home-shortcut span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ .topbar-right{gap:7px}
+}
