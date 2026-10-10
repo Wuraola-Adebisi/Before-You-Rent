@@ -18,6 +18,12 @@ export const dbPromise = openDB<RentDB>(DB_NAME, 2, {
   },
 });
 export async function getProperties() { return (await dbPromise).getAllFromIndex('properties', 'by-updated'); }
+export async function deleteAllData() {
+  const db = await dbPromise;
+  const tx = db.transaction(['properties', 'answers', 'costs', 'notes', 'photos'], 'readwrite');
+  tx.objectStore('properties').clear(); tx.objectStore('answers').clear(); tx.objectStore('costs').clear(); tx.objectStore('notes').clear(); tx.objectStore('photos').clear();
+  await tx.done;
+}
 export async function saveProperty(value: PropertyRecord) { return (await dbPromise).put('properties', value); }
 export async function deleteProperty(id: string) {
   const db = await dbPromise; const tx = db.transaction(['properties','answers','costs','notes','photos'], 'readwrite');

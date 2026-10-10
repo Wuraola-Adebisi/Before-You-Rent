@@ -2,7 +2,7 @@ export type CheckStatus = 'okay' | 'concern' | 'not_checked' | 'not_applicable';
 export type CostKind = 'upfront' | 'recurring';
 export type PropertyRecord = {
   id: string; name: string; address: string; propertyType: string; bedrooms: number;
-  rentAmount: number; rentDuration: 'year' | 'month'; inspectionDate: string;
+  rentAmount: number; rentDuration: 'year' | 'month' | 'quarter' | 'half_year'; inspectionDate: string;
   createdAt: string; updatedAt: string; notes: string;
 };
 export type InspectionAnswer = { propertyId: string; itemId: string; status: CheckStatus; note: string; updatedAt: string };
