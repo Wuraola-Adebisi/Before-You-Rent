@@ -53,22 +53,30 @@ export async function importBackupData(
     () => ({ ok: true as const }),
     error => ({ ok: false as const, error }),
   );
+  type WriteResult = { ok: true } | { ok: false; error: unknown };
+  const writes: Promise<WriteResult>[] = [];
+  const enqueue = (write: Promise<unknown>) => {
+    writes.push(write.then(
+      () => ({ ok: true as const }),
+      error => ({ ok: false as const, error }),
+    ));
+  };
   try {
-    const writes: Promise<unknown>[] = [];
-    for (const property of properties) writes.push(tx.objectStore('properties').put(property));
+    for (const property of properties) enqueue(tx.objectStore('properties').put(property));
     for (const detail of details) {
-      for (const answer of detail.answers) writes.push(tx.objectStore('answers').put(answer));
-      for (const cost of detail.costs) writes.push(tx.objectStore('costs').put(cost));
-      for (const note of detail.notes) writes.push(tx.objectStore('notes').put(note));
-      for (const photo of detail.photos) writes.push(tx.objectStore('photos').put(photo));
+      for (const answer of detail.answers) enqueue(tx.objectStore('answers').put(answer));
+      for (const cost of detail.costs) enqueue(tx.objectStore('costs').put(cost));
+      for (const note of detail.notes) enqueue(tx.objectStore('notes').put(note));
+      for (const photo of detail.photos) enqueue(tx.objectStore('photos').put(photo));
     }
-    const results = await Promise.allSettled(writes);
+    const results = await Promise.all(writes);
     const outcome = await completion;
-    const failedWrite = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
-    if (!outcome.ok) throw failedWrite?.reason ?? outcome.error;
-    if (failedWrite) throw failedWrite.reason;
+    const failedWrite = results.find((result): result is { ok: false; error: unknown } => !result.ok);
+    if (!outcome.ok) throw failedWrite?.error ?? outcome.error;
+    if (failedWrite) throw failedWrite.error;
   } catch (error) {
     try { tx.abort(); } catch { /* The transaction may already be complete or aborted. */ }
+    await Promise.all(writes);
     await completion;
     throw error;
   }
