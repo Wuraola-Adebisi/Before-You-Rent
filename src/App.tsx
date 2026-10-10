@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type Re
 import { Camera, ImagePlus, ArrowDownRight, ArrowLeft, ArrowRight, Banknote, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, CircleHelp, ClipboardCheck, Clock3, FileText, Home, House, ListChecks, MapPin, Menu, Plus, Search, ShieldCheck, SlidersHorizontal, Sparkles, Trash2, Wallet, X } from 'lucide-react';
 import { deleteProperty, getAnswers, getCosts, getNotes, getPhotos, getProperties, removeCost, removeNote, removePhoto, saveAnswer, saveCost, saveNote, savePhoto, saveProperty } from './db';
 import { CHECKLIST, type CheckStatus, type InspectionAnswer, type InspectionNote, type InspectionPhoto, type PropertyCost, type PropertyRecord } from './types';
+import MarketingSite from './MarketingSite';
 
 type View = 'overview' | 'properties' | 'inspection' | 'costs' | 'compare' | 'settings';
 const money = (amount: number) => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
@@ -12,7 +13,7 @@ const statusText: Record<CheckStatus, string> = { okay: 'Looks okay', concern: '
 function blobToDataUrl(blob:Blob):Promise<string>{return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob)})}
 function dataUrlToBlob(value:string):Blob{const parts=value.split(',');if(parts.length!==2||!parts[0].startsWith('data:image/'))throw new Error('A photo in this backup is invalid.');const mime=parts[0].slice(5).split(';')[0];const binary=atob(parts[1]);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:mime})}
 
-export default function App() {
+function WorkspaceApp() {
   const [view, setView] = useState<View>('overview');
   const [properties, setProperties] = useState<PropertyRecord[]>([]);
   const [activeId, setActiveId] = useState('');
@@ -128,7 +129,7 @@ export default function App() {
 
   return <div className="app-shell">
     <aside className={'sidebar ' + (mobileNav ? 'sidebar-open' : '')}>
-      <button className="brand" onClick={() => navigate('overview')} aria-label="Before You Rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">before you <b>rent.</b><small>YOUR RENTING COMPANION</small></span></button>
+      <button className="brand" onClick={() => navigate('overview')} aria-label="Before You Rent home"><span className="brand-mark"><House size={19} strokeWidth={2.4}/></span><span className="brand-copy">Before You <b>Rent.</b></span></button>
       <div className="workspace-label">WORKSPACE</div>
       <nav className="nav-list" aria-label="Main navigation">
         <NavItem active={view === 'overview'} icon={<Home size={18}/>} label="Overview" onClick={() => navigate('overview')}/>
@@ -138,14 +139,14 @@ export default function App() {
         <NavItem active={view === 'compare'} icon={<SlidersHorizontal size={18}/>} label="Compare options" onClick={() => navigate('compare')} disabled={properties.length < 2}/>
       </nav>
       <div className="sidebar-bottom">
-        <div className="privacy-card"><span className="privacy-icon"><ShieldCheck size={18}/></span><div><b>Your records stay here</b><p>Saved on this device. No account needed.</p></div></div>
+        
         <button className="nav-item" onClick={() => navigate('settings')}><span className="nav-icon"><CircleHelp size={18}/></span><span>Data & help</span></button>
         <div className="sidebar-foot"><span className="online-dot"/> PRIVATE BY DEFAULT <span className="version">V0.1</span></div>
       </div>
     </aside>
     {mobileNav && <button className="mobile-scrim" onClick={() => setMobileNav(false)} aria-label="Close navigation"/>}
     <main className="main-area">
-      <header className="topbar"><button className="mobile-menu icon-button" onClick={() => setMobileNav(!mobileNav)} aria-label="Open menu"><Menu size={21}/></button><div className="breadcrumb">Your space <span>/</span> <b>{viewLabels[view]}</b></div><div className="topbar-right"><span className="save-status"><span className="online-dot"/> Saved locally</span><button className="avatar" title="Local workspace">R</button></div></header>
+      <header className="topbar"><button className="mobile-menu icon-button" onClick={() => setMobileNav(!mobileNav)} aria-label="Open menu"><Menu size={21}/></button><div className="breadcrumb">Your space <span>/</span> <b>{viewLabels[view]}</b></div><div className="topbar-right"><button className="avatar" title="Workspace">BYR</button></div></header>
       <div className="page-content">
         {error && <div className="alert-error" role="alert"><CircleHelp size={17}/><span>{error}</span><button onClick={() => setError('')} aria-label="Dismiss error"><X size={16}/></button></div>}
         {loading ? <div className="loading-state"><div className="loader"/><p>Opening your workspace…</p></div> : <>
@@ -157,9 +158,9 @@ export default function App() {
           {view === 'settings' && <SettingsView onExport={exportData} onImport={importData} count={properties.length}/>}
         </>}
       </div>
-      <footer className="page-footer"><span>BEFORE YOU RENT <span className="footer-dot">•</span> MAKE A BETTER-INFORMED MOVE</span><span>Information tool, not a property safety certification.</span></footer>
+      <footer className="page-footer"><span>Before You Rent <span className="footer-dot">•</span> Make a better-informed move</span><span className="workspace-footer-links"><a href="/">Home</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><span>Decision support, not a property safety certification.</span></span></footer>
     </main>
-    {showCreate && <div className="modal-backdrop" role="presentation" onMouseDown={e => { if(e.target === e.currentTarget) setShowCreate(false); }}><section className="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-title"><div className="modal-head"><div><span className="eyebrow">NEW PROPERTY</span><h2 id="create-title">Let’s get the details down.</h2><p>Add the basics now. You can fill in the rest while inspecting.</p></div><button className="icon-button" onClick={() => setShowCreate(false)} aria-label="Close"><X size={20}/></button></div><form onSubmit={createProperty} className="create-form"><label>Property name <input name="name" placeholder="e.g. Flat on Awolowo Road" required autoFocus maxLength={90}/></label><label>Address or area <input name="address" placeholder="Street, neighbourhood, city" required maxLength={180}/></label><div className="form-row"><label>Property type<select name="propertyType"><option>Flat</option><option>Self-contained</option><option>Duplex</option><option>Room</option><option>Terrace</option><option>Bungalow</option><option>Shared apartment</option><option>Other</option></select></label><label>Bedrooms<select name="bedrooms"><option value="0">Studio / none</option><option value="1" selected>1 bedroom</option><option value="2">2 bedrooms</option><option value="3">3 bedrooms</option><option value="4">4+ bedrooms</option></select></label></div><label>Advertised rent <div className="money-input"><span>₦</span><input name="rentAmount" type="number" min="0" step="1000" placeholder="e.g. 1800000" required/></div></label><div className="form-row"><label>Rent period<select name="rentDuration"><option value="year">Per year</option><option value="month">Per month</option></select></label><label>Inspection date<input name="inspectionDate" type="date" defaultValue={today()} required/></label></div><div className="form-note"><ShieldCheck size={17}/><span>Your details are saved in this browser. You can add costs, photos, and notes as you go.</span></div><div className="modal-actions"><button type="button" className="button-secondary" onClick={() => setShowCreate(false)}>Cancel</button><button type="submit" className="button-primary">Create property <ArrowRight size={16}/></button></div></form></section></div>}
+    {showCreate && <div className="modal-backdrop" role="presentation" onMouseDown={e => { if(e.target === e.currentTarget) setShowCreate(false); }}><section className="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-title"><div className="modal-head"><div><span className="eyebrow">NEW PROPERTY</span><h2 id="create-title">Let’s get the details down.</h2><p>Add the basics now. You can fill in the rest while inspecting.</p></div><button className="icon-button" onClick={() => setShowCreate(false)} aria-label="Close"><X size={20}/></button></div><form onSubmit={createProperty} className="create-form"><label>Property name <input name="name" placeholder="e.g. Flat on Awolowo Road" required autoFocus maxLength={90}/></label><label>Address or area <input name="address" placeholder="Street, neighbourhood, city" required maxLength={180}/></label><div className="form-row"><label>Property type<select name="propertyType"><option>Flat</option><option>Self-contained</option><option>Duplex</option><option>Room</option><option>Terrace</option><option>Bungalow</option><option>Shared apartment</option><option>Other</option></select></label><label>Bedrooms<select name="bedrooms"><option value="0">Studio / none</option><option value="1" selected>1 bedroom</option><option value="2">2 bedrooms</option><option value="3">3 bedrooms</option><option value="4">4+ bedrooms</option></select></label></div><label>Advertised rent <div className="money-input"><span>₦</span><input name="rentAmount" type="number" min="0" step="1000" placeholder="e.g. 1800000" required/></div></label><div className="form-row"><label>Rent period<select name="rentDuration"><option value="year">Per year</option><option value="month">Per month</option></select></label><label>Inspection date<input name="inspectionDate" type="date" defaultValue={today()} required/></label></div><div className="modal-actions"><button type="button" className="button-secondary" onClick={() => setShowCreate(false)}>Cancel</button><button type="submit" className="button-primary">Create property <ArrowRight size={16}/></button></div></form></section></div>}
     {toast && <div className="toast"><CheckCircle2 size={18}/>{toast}</div>}
   </div>;
 }
@@ -251,4 +252,11 @@ function CompareView({properties,onOpen,onCreate}:{properties:PropertyRecord[];o
 function ArrowUpRightFallback() { return <ArrowRight size={14}/>; }
 function SettingsView({onExport,onImport,count}:{onExport:()=>void;onImport:(file:File)=>void;count:number}) {
  return <><PageHeading eyebrow="PRIVACY AND PRACTICALITIES" title="Your data, your call." description="Understand where your records live and how to keep a copy."/><div className="settings-grid"><section className="panel settings-panel"><span className="settings-icon"><ShieldCheck size={22}/></span><h2>Stored on this device</h2><p>Your property records, checklist responses, costs, notes, and photos are saved in this browser using IndexedDB. There is no account or cloud sync in this version.</p><ul><li>Other browsers and devices will not automatically have your records.</li><li>Clearing browser data may remove your records.</li><li>Anyone with access to this browser profile may be able to view them.</li></ul><div className="backup-actions"><button className="button-primary" onClick={onExport}><FileText size={16}/> Export a backup (.json)</button><label className="button-secondary import-backup">Import backup<input type="file" accept="application/json,.json" onChange={e=>{const file=e.currentTarget.files?.[0];if(file)onImport(file);e.currentTarget.value='';}}/></label></div></section><section className="panel settings-panel"><span className="settings-icon"><ClipboardCheck size={22}/></span><h2>What this tool can’t verify</h2><p>Before You Rent is a decision-support tool, not an inspection certificate, legal service, or landlord verification service.</p><ul><li>It cannot guarantee structural safety or detect hidden defects.</li><li>It cannot confirm a person’s authority to rent a property.</li><li>It cannot replace professional building, legal, or financial advice.</li></ul><span className="settings-count">{count} {count===1?'property':'properties'} currently saved in this browser</span></section></div><div className="bottom-note"><div className="note-icon"><CircleHelp size={19}/></div><p><b>Back up before switching devices.</b> Export creates a JSON file containing your records and attached photos. Keep it somewhere private and secure.</p></div></>;
+}
+
+
+export default function App() {
+  const path = window.location.pathname.replace(/\\/+$/, '') || '/';
+  if (path === '/app' || path.startsWith('/app/')) return <WorkspaceApp />;
+  return <MarketingSite path={path} />;
 }
