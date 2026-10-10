@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { Camera, ImagePlus, ArrowDownRight, ArrowLeft, ArrowRight, Banknote, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, CircleHelp, ClipboardCheck, Clock3, FileText, Home, House, ListChecks, MapPin, Menu, Plus, Search, ShieldCheck, SlidersHorizontal, Sparkles, Trash2, Wallet, X } from 'lucide-react';
 import { deleteProperty, getAnswers, getCosts, getNotes, getPhotos, getProperties, removeCost, removeNote, removePhoto, saveAnswer, saveCost, saveNote, savePhoto, saveProperty } from './db';
 import { CHECKLIST, type CheckStatus, type InspectionAnswer, type InspectionNote, type InspectionPhoto, type PropertyCost, type PropertyRecord } from './types';
@@ -9,6 +9,8 @@ const shortDate = (value: string) => value ? new Date(value + 'T12:00:00').toLoc
 const today = () => new Date().toISOString().slice(0, 10);
 const newId = () => crypto.randomUUID();
 const statusText: Record<CheckStatus, string> = { okay: 'Looks okay', concern: 'Needs attention', not_checked: 'Not checked', not_applicable: 'Not applicable' };
+function blobToDataUrl(blob:Blob):Promise<string>{return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob)})}
+function dataUrlToBlob(value:string):Blob{const parts=value.split(',');if(parts.length!==2||!parts[0].startsWith('data:image/'))throw new Error('A photo in this backup is invalid.');const mime=parts[0].slice(5).split(';')[0];const binary=atob(parts[1]);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:mime})}
 
 export default function App() {
   const [view, setView] = useState<View>('overview');
@@ -81,16 +83,21 @@ export default function App() {
   function startInspection(property: PropertyRecord) { setActiveId(property.id); setView('inspection'); }
   async function importData(file: File) {
     try {
-      const parsed = JSON.parse(await file.text()) as { schemaVersion?: number; properties?: PropertyRecord[]; details?: Array<{ id: string; answers?: InspectionAnswer[]; costs?: PropertyCost[]; notes?: InspectionNote[] }> };
+      if (file.size > 50 * 1024 * 1024) throw new Error('Backup file is larger than 50 MB.');
+      const parsed = JSON.parse(await file.text()) as { schemaVersion?: number; properties?: PropertyRecord[]; details?: Array<{ id: string; answers?: InspectionAnswer[]; costs?: PropertyCost[]; notes?: InspectionNote[]; photos?: Array<Omit<InspectionPhoto,'blob'> & {blob:string}> }> };
       if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.properties) || !Array.isArray(parsed.details)) throw new Error('This is not a supported Before You Rent backup.');
       if (!parsed.properties.every(p => p && typeof p.id === 'string' && typeof p.name === 'string' && typeof p.address === 'string')) throw new Error('The backup contains an invalid property record.');
-      if (!window.confirm('Import ' + parsed.properties.length + ' properties? This merges the backup into this browser. Matching IDs will be overwritten; unrelated records will remain.')) return;
+      if (!window.confirm('Import ' + parsed.properties.length + ' properties? This merges the backup into this browser. Matching IDs will be overwritten; unrelated records will remain. Photo evidence is included.')) return;
       for (const property of parsed.properties) await saveProperty(property);
       for (const detail of parsed.details) {
         if (!detail || typeof detail.id !== 'string') continue;
         for (const answer of detail.answers ?? []) await saveAnswer(answer);
         for (const cost of detail.costs ?? []) await saveCost(cost);
         for (const note of detail.notes ?? []) await saveNote(note);
+        for (const photo of detail.photos ?? []) {
+          if (typeof photo.blob !== 'string') throw new Error('A photo in this backup is invalid.');
+          await savePhoto({...photo, blob:dataUrlToBlob(photo.blob)});
+        }
       }
       await refresh();
       setToast('Backup imported. Review the merged records before relying on them.');
@@ -100,12 +107,25 @@ export default function App() {
     }
   }
 
-  function exportData() {
-    Promise.all([getProperties(), ...properties.map(async p => ({ id:p.id, answers:await getAnswers(p.id), costs:await getCosts(p.id), notes:await getNotes(p.id) }))]).then(([records, ...details]) => {
+  async function exportData() {
+    try {
+      const records = await getProperties();
+      const details = await Promise.all(records.map(async property => ({
+        id: property.id,
+        answers: await getAnswers(property.id),
+        costs: await getCosts(property.id),
+        notes: await getNotes(property.id),
+        photos: await Promise.all((await getPhotos(property.id)).map(async photo => ({...photo, blob: await blobToDataUrl(photo.blob)}))),
+      })));
       const payload = { schemaVersion: 1, exportedAt: new Date().toISOString(), properties: records, details };
-      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-      const a = document.createElement('a'); a.href = url; a.download = 'before-you-rent-backup.json'; a.click(); URL.revokeObjectURL(url);
-    }).catch(() => setError('Export failed. Please try again.'));
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'before-you-rent-backup.json'; a.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setToast('Backup created. Keep it somewhere private and secure.');
+      window.setTimeout(() => setToast(''), 3500);
+    } catch {
+      setError('Export failed. Your browser may not have enough memory to package the selected records and photos.');
+    }
   }
 
   return <div className="app-shell">
@@ -147,9 +167,9 @@ export default function App() {
 }
 
 const viewLabels: Record<View,string> = { overview:'Overview', properties:'My properties', inspection:'Inspection', costs:'Cost breakdown', compare:'Compare options', settings:'Data & help' };
-function NavItem({ active, icon, label, count, onClick, disabled=false }: {active:boolean; icon:React.ReactNode; label:string; count?:number; onClick:()=>void; disabled?:boolean}) { return <button className={'nav-item ' + (active?'nav-active ':'') + (disabled?'nav-disabled':'')} onClick={onClick} disabled={disabled}><span className="nav-icon">{icon}</span><span>{label}</span>{count !== undefined && <span className="nav-count">{count}</span>}{active && <span className="active-line"/>}</button>; }
+function NavItem({ active, icon, label, count, onClick, disabled=false }: {active:boolean; icon:ReactNode; label:string; count?:number; onClick:()=>void; disabled?:boolean}) { return <button className={'nav-item ' + (active?'nav-active ':'') + (disabled?'nav-disabled':'')} onClick={onClick} disabled={disabled}><span className="nav-icon">{icon}</span><span>{label}</span>{count !== undefined && <span className="nav-count">{count}</span>}{active && <span className="active-line"/>}</button>; }
 
-function PageHeading({ eyebrow, title, description, action }: {eyebrow:string;title:React.ReactNode;description:React.ReactNode;action?:React.ReactNode}) { return <div className="page-heading"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>{action}</div>; }
+function PageHeading({ eyebrow, title, description, action }: {eyebrow:string;title:ReactNode;description:ReactNode;action?:ReactNode}) { return <div className="page-heading"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>{action}</div>; }
 
 function Overview({properties,active,answered,concerns,progress,onCreate,onNavigate,onOpen}:{properties:PropertyRecord[];active:PropertyRecord|null;answered:number;concerns:number;progress:number;onCreate:()=>void;onNavigate:(v:View)=>void;onOpen:(p:PropertyRecord)=>void}) {
   const recent = [...properties].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)).slice(0,3);
@@ -162,7 +182,7 @@ function Overview({properties,active,answered,concerns,progress,onCreate,onNavig
     <div className="bottom-note"><div className="note-icon"><ShieldCheck size={19}/></div><p><b>A note on peace of mind.</b> Before You Rent helps you organise observations and questions. It cannot verify a landlord, guarantee a building’s safety, or replace professional advice.</p><button onClick={() => onNavigate('settings')}>How your data works <ArrowRight size={14}/></button></div>
   </>;
 }
-function StatCard({icon,label,value,note,tone,onClick}:{icon:React.ReactNode;label:string;value:string;note:string;tone:string;onClick?:()=>void}) { return <button className={'stat-card stat-'+tone} onClick={onClick} disabled={!onClick}><span className="stat-top"><span className="stat-icon">{icon}</span><span className="stat-trend"><ArrowDownRight size={15}/></span></span><span className="stat-label">{label}</span><strong>{value}</strong><span className="stat-note">{note}</span></button>; }
+function StatCard({icon,label,value,note,tone,onClick}:{icon:ReactNode;label:string;value:string;note:string;tone:string;onClick?:()=>void}) { return <button className={'stat-card stat-'+tone} onClick={onClick} disabled={!onClick}><span className="stat-top"><span className="stat-icon">{icon}</span><span className="stat-trend"><ArrowDownRight size={15}/></span></span><span className="stat-label">{label}</span><strong>{value}</strong><span className="stat-note">{note}</span></button>; }
 
 function PropertiesView({properties,search,setSearch,onCreate,onOpen,onDelete}:{properties:PropertyRecord[];search:string;setSearch:(s:string)=>void;onCreate:()=>void;onOpen:(p:PropertyRecord)=>void;onDelete:(p:PropertyRecord)=>void}) {
  return <><PageHeading eyebrow="YOUR SHORTLIST" title="Properties" description="Keep every viewing, fee, and follow-up tied to the right place." action={<button className="button-primary" onClick={onCreate}><Plus size={17}/> Add property</button>}/><div className="toolbar"><div className="search-field"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by property or area…" aria-label="Search properties"/></div><span className="results-count">{properties.length} {properties.length===1?'property':'properties'}</span></div>{properties.length ? <div className="property-grid">{properties.map((p,i)=><article className="property-card" key={p.id}><div className={'property-card-art thumb-'+(i%3)}><span className="property-type-pill">{p.propertyType}</span><span className="property-card-number">{String(i+1).padStart(2,'0')}</span><House size={42}/></div><div className="property-card-body"><div className="property-card-title"><h3>{p.name}</h3><button className="icon-button tiny danger" onClick={()=>onDelete(p)} aria-label={'Delete '+p.name}><Trash2 size={15}/></button></div><p className="address-line"><MapPin size={14}/>{p.address}</p><div className="property-card-meta"><span><Building2 size={14}/>{p.bedrooms===0?'Studio':p.bedrooms+' bed'}</span><span><CalendarDays size={14}/>{shortDate(p.inspectionDate)}</span></div><div className="property-card-price"><div><strong>{money(p.rentAmount)}</strong><span> / {p.rentDuration}</span></div><button onClick={()=>onOpen(p)} aria-label={'Open '+p.name}><ArrowRight size={17}/></button></div></div></article>)}</div>:<div className="empty-state"><div className="empty-illustration"><House size={30}/></div><h3>{search?'No matching properties':'Your shortlist is empty'}</h3><p>{search?'Try another property name or neighbourhood.':'Add the first property you want to inspect. You can track costs, checks, and questions for each one.'}</p>{search?<button className="button-secondary" onClick={()=>setSearch('')}>Clear search</button>:<button className="button-primary" onClick={onCreate}><Plus size={17}/> Add property</button>}</div>}</>;
@@ -199,7 +219,7 @@ function PhotosPanel({propertyId}:{propertyId:string}) {
  const [error,setError]=useState('');
  const [busy,setBusy]=useState(false);
  useEffect(()=>{let cancelled=false;getPhotos(propertyId).then(items=>{if(!cancelled)setPhotos(items)}).catch(()=>setError('Could not load saved photos.'));return()=>{cancelled=true}},[propertyId]);
- async function addFiles(event:React.ChangeEvent<HTMLInputElement>){const files=Array.from(event.currentTarget.files??[]);event.currentTarget.value='';if(!files.length)return;const invalid=files.find(file=>!file.type.startsWith('image/')||file.size>8*1024*1024);if(invalid){setError('Choose image files under 8 MB each. Large images can fill browser storage quickly.');return}setBusy(true);setError('');try{const added:InspectionPhoto[]=[];for(const file of files){const photo:InspectionPhoto={id:newId(),propertyId,name:file.name,mimeType:file.type,blob:file,caption:caption.trim(),createdAt:new Date().toISOString()};await savePhoto(photo);added.push(photo)}setPhotos(old=>[...added,...old]);setCaption('')}catch{setError('The image could not be saved. Browser storage may be full.')}finally{setBusy(false)}}
+ async function addFiles(event:ChangeEvent<HTMLInputElement>){const files=Array.from(event.currentTarget.files??[]);event.currentTarget.value='';if(!files.length)return;const invalid=files.find(file=>!file.type.startsWith('image/')||file.size>8*1024*1024);if(invalid){setError('Choose image files under 8 MB each. Large images can fill browser storage quickly.');return}setBusy(true);setError('');try{const added:InspectionPhoto[]=[];for(const file of files){const photo:InspectionPhoto={id:newId(),propertyId,name:file.name,mimeType:file.type,blob:file,caption:caption.trim(),createdAt:new Date().toISOString()};await savePhoto(photo);added.push(photo)}setPhotos(old=>[...added,...old]);setCaption('')}catch{setError('The image could not be saved. Browser storage may be full.')}finally{setBusy(false)}}
  async function remove(id:string){try{await removePhoto(id);setPhotos(old=>old.filter(photo=>photo.id!==id))}catch{setError('The image could not be removed.')}}
  return <section className="panel photos-panel"><div className="panel-head"><div><span className="eyebrow">VISUAL EVIDENCE</span><h2>Photos from the viewing</h2></div><span className="round-icon"><Camera size={19}/></span></div><p className="panel-intro">Photograph visible issues, meters, fittings, damage, and anything you want to ask about. Get permission before photographing people or private belongings.</p>{error&&<div className="alert-error" role="alert">{error}<button onClick={()=>setError('')}><X size={14}/></button></div>}<div className="photo-upload-row"><label className="photo-caption-field">Caption (optional)<input value={caption} onChange={e=>setCaption(e.target.value)} placeholder="e.g. Damp patch beside bedroom window" maxLength={140}/></label><label className={'button-primary photo-upload '+(busy?'upload-disabled':'')}>{busy?'Saving…':<><ImagePlus size={16}/> Add photos</>}<input type="file" accept="image/*" multiple disabled={busy} onChange={addFiles}/></label></div><p className="photo-storage-note">Images stay in this browser. Up to 8 MB per image; storage availability depends on your device.</p>{photos.length?<div className="evidence-grid">{photos.map(photo=><PhotoThumb key={photo.id} photo={photo} onRemove={remove}/>)}</div>:<div className="photo-empty"><ImagePlus size={24}/><b>No viewing photos yet.</b><span>Evidence can make follow-up conversations more specific.</span></div>}</section>;
 }
