@@ -309,6 +309,25 @@ function SettingsView({onExport,onImport,onDeleteAll,count}:{onExport:()=>void;o
 
 export default function App() {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  useEffect(() => {
+    const metadata: Record<string, { title: string; description: string }> = {
+      '/': { title: 'Before you rent | Make a better-informed move', description: 'Inspect a rental, track the real costs, and compare your options before you commit.' },
+      '/app': { title: 'Your renting workspace | Before you rent', description: 'Keep rental property details, inspection checks, costs, questions, and photos together on this device.' },
+      '/inspection-checklist': { title: 'Rental inspection checklist | Before you rent', description: 'A practical checklist for rental viewings: building condition, water and power, surroundings, and paperwork.' },
+      '/contact': { title: 'Contact | Before you rent', description: 'Contact Before you rent with product questions and feedback.' },
+      '/privacy': { title: 'Privacy policy | Before you rent', description: 'Learn how Before you rent stores local property records, photos, and backups.' },
+      '/terms': { title: 'Terms of use | Before you rent', description: 'Read the terms and limitations of the Before you rent decision-support tool.' },
+    };
+    const current = metadata[path] ?? metadata['/'];
+    document.title = current.title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', current.description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', current.title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', current.description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', window.location.origin + path);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', current.title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', current.description);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', window.location.origin + path);
+  }, [path]);
   if (path === '/app' || path.startsWith('/app/')) return <WorkspaceApp />;
   return <MarketingSite path={path} />;
 }
