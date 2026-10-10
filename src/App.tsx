@@ -4,7 +4,7 @@ import { deleteAllData, deleteProperty, getAnswers, getCosts, getNotes, getPhoto
 import { CHECKLIST, type CheckStatus, type InspectionAnswer, type InspectionNote, type InspectionPhoto, type PropertyCost, type PropertyRecord } from './types';
 import MarketingSite from './MarketingSite';
 import { rentMonthlyEquivalent, rentPeriodLabel, summarizeCosts } from './finance';
-import { validateBackupPayload } from './backup';
+import { isBackupFileSizeAllowed, MAX_BACKUP_BYTES, validateBackupPayload } from './backup';
 
 type View = 'overview' | 'properties' | 'inspection' | 'costs' | 'compare' | 'settings';
 const money = (amount: number) => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
@@ -105,7 +105,7 @@ function WorkspaceApp() {
   function startEdit(property: PropertyRecord) { setEditingProperty(property); setRentDurationDraft(property.rentDuration); setShowCreate(true); }
   async function importData(file: File) {
     try {
-      if (file.size > 50 * 1024 * 1024) throw new Error('Backup file is larger than 50 MB.');
+      if (!isBackupFileSizeAllowed(file.size)) throw new Error('Backup file must be 50 MB or smaller.');
       const parsed = JSON.parse(await file.text()) as { schemaVersion: number; properties: PropertyRecord[]; details: Array<{ id: string; answers: InspectionAnswer[]; costs: PropertyCost[]; notes: InspectionNote[]; photos: Array<Omit<InspectionPhoto,'blob'> & {blob:string}> }> };
       const validationError = validateBackupPayload(parsed);
       if (validationError) throw new Error(validationError);
@@ -138,7 +138,7 @@ function WorkspaceApp() {
       })));
       const payload = { schemaVersion: 1, exportedAt: new Date().toISOString(), properties: records, details };
       const backupBlob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      if (backupBlob.size > 50 * 1024 * 1024) throw new Error('Backup exceeds the 50 MB import limit. Remove or reduce large photos, then export again.');
+      if (backupBlob.size > MAX_BACKUP_BYTES) throw new Error('Backup exceeds the 50 MB import limit. Remove or reduce large photos, then export again.');
       const url = URL.createObjectURL(backupBlob);
       const a = document.createElement('a'); a.href = url; a.download = 'before-you-rent-backup.json'; a.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);

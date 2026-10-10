@@ -1,3 +1,6 @@
+export const MAX_BACKUP_BYTES = 50 * 1024 * 1024;
+export function isBackupFileSizeAllowed(size: number): boolean { return Number.isSafeInteger(size) && size >= 0 && size <= MAX_BACKUP_BYTES; }
+
 type AnyRecord = Record<string, unknown>;
 const isRecord = (value: unknown): value is AnyRecord => typeof value === 'object' && value !== null && !Array.isArray(value);
 const isText = (value: unknown): value is string => typeof value === 'string';

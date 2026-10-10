@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rentMonthlyEquivalent, rentPeriodMonths, rentPeriodLabel, summarizeCosts } from '../src/finance.ts';
-import { validateBackupPayload } from '../src/backup.ts';
+import { isBackupFileSizeAllowed, MAX_BACKUP_BYTES, validateBackupPayload } from '../src/backup.ts';
 import 'fake-indexeddb/auto';
 const database = await import('../src/db.ts');
 
@@ -132,4 +132,20 @@ test('deleting a property removes its related records and delete-all clears ever
   assert.equal((await database.getPhotos('p1')).length, 0);
   await database.deleteAllData();
   assert.equal((await database.getProperties()).length, 0);
+});
+
+test('backup size guard accepts the maximum and rejects oversized or invalid sizes', () => {
+  assert.equal(isBackupFileSizeAllowed(0), true);
+  assert.equal(isBackupFileSizeAllowed(MAX_BACKUP_BYTES), true);
+  assert.equal(isBackupFileSizeAllowed(MAX_BACKUP_BYTES + 1), false);
+  assert.equal(isBackupFileSizeAllowed(-1), false);
+  assert.equal(isBackupFileSizeAllowed(Number.POSITIVE_INFINITY), false);
+});
+test('backup validator accepts a valid photo and rejects duplicate photo IDs', () => {
+  const payload=backup();
+  const photo={id:'ph1',propertyId:'p1',name:'meter.jpg',mimeType:'image/jpeg',caption:'Meter',createdAt:'2026-10-10T10:00:00.000Z',blob:'data:image/jpeg;base64,SGVsbG8=',includeInReport:true};
+  payload.details[0].photos.push(photo);
+  assert.equal(validateBackupPayload(payload), null);
+  payload.details[0].photos.push({...photo,propertyId:'p1'});
+  assert.match(validateBackupPayload(payload), /duplicate cost, question, or photo IDs/);
 });
