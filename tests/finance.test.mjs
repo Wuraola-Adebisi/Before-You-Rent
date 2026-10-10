@@ -21,6 +21,8 @@ test('rent durations normalise to months consistently', () => {
   assert.equal(rentMonthlyEquivalent(1200000, 'year'), 100000);
   assert.equal(rentMonthlyEquivalent(100000, 'month'), 100000);
   assert.equal(rentPeriodLabel('quarter'), 'every 3 months');
+  assert.equal(rentMonthlyEquivalent(600000, 'custom', 2), 300000);
+  assert.equal(rentPeriodLabel('custom', 2), 'every 2 months');
 });
 test('invalid rent amounts never produce invalid monthly totals', () => {
   assert.equal(rentMonthlyEquivalent(Number.NaN, 'year'), 0);

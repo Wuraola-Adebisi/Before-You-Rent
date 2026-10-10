@@ -3,7 +3,7 @@ const isRecord = (value: unknown): value is AnyRecord => typeof value === 'objec
 const isText = (value: unknown): value is string => typeof value === 'string';
 const validDate = (value: unknown) => { if (!isText(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const date = new Date(value + 'T00:00:00.000Z'); return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value; };
 const validTimestamp = (value: unknown) => isText(value) && !Number.isNaN(Date.parse(value));
-const validDuration = (value: unknown) => ['month', 'quarter', 'half_year', 'year'].includes(String(value));
+const validDuration = (value: unknown) => ['month', 'quarter', 'half_year', 'year', 'custom'].includes(String(value));
 const unique = (values: string[]) => new Set(values).size === values.length;
 
 export function validateBackupPayload(value: unknown): string | null {
@@ -15,7 +15,7 @@ export function validateBackupPayload(value: unknown): string | null {
   for (const property of properties) {
     if (!isText(property.name) || !property.name.trim() || property.name.length > 90 || !isText(property.address) || !property.address.trim() || property.address.length > 180) return 'A property is missing a valid name or address.';
     if (!isText(property.propertyType) || typeof property.bedrooms !== 'number' || !Number.isInteger(property.bedrooms) || property.bedrooms < 0 || typeof property.rentAmount !== 'number' || !Number.isFinite(property.rentAmount) || property.rentAmount <= 0) return 'A property has an invalid type, bedroom count, or rent amount.';
-    if (!validDuration(property.rentDuration) || !validDate(property.inspectionDate) || !validTimestamp(property.createdAt) || !validTimestamp(property.updatedAt)) return 'A property has an invalid rent period or date.';
+    if (!validDuration(property.rentDuration) || (property.rentDuration === 'custom' && (typeof property.rentPeriodMonths !== 'number' || !Number.isInteger(property.rentPeriodMonths) || property.rentPeriodMonths < 1 || property.rentPeriodMonths > 120)) || !validDate(property.inspectionDate) || !validTimestamp(property.createdAt) || !validTimestamp(property.updatedAt)) return 'A property has an invalid rent period or date.';
     if (!isText(property.notes)) return 'A property notes field is invalid.';
   }
   if (value.details.length !== properties.length || !value.details.every(isRecord)) return 'The backup is missing property details or contains unexpected detail records.';

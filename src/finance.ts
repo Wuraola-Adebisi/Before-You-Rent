@@ -1,14 +1,18 @@
 import type { PropertyCost, PropertyRecord } from './types';
 
-const RENT_PERIOD_MONTHS: Record<PropertyRecord['rentDuration'], number> = { month: 1, quarter: 3, half_year: 6, year: 12 };
-export function rentPeriodMonths(duration: PropertyRecord['rentDuration']): number { return RENT_PERIOD_MONTHS[duration] ?? 12; }
-export function rentPeriodLabel(duration: PropertyRecord['rentDuration']): string {
-  const labels: Record<PropertyRecord['rentDuration'], string> = { month: 'per month', quarter: 'every 3 months', half_year: 'every 6 months', year: 'per year' };
+const RENT_PERIOD_MONTHS: Record<Exclude<PropertyRecord['rentDuration'], 'custom'>, number> = { month: 1, quarter: 3, half_year: 6, year: 12 };
+export function rentPeriodMonths(duration: PropertyRecord['rentDuration'], customMonths?: number): number {
+  if (duration === 'custom') return Number.isInteger(customMonths) && Number(customMonths) >= 1 && Number(customMonths) <= 120 ? Number(customMonths) : 12;
+  return RENT_PERIOD_MONTHS[duration] ?? 12;
+}
+export function rentPeriodLabel(duration: PropertyRecord['rentDuration'], customMonths?: number): string {
+  if (duration === 'custom') return 'every ' + rentPeriodMonths(duration, customMonths) + ' months';
+  const labels: Record<Exclude<PropertyRecord['rentDuration'], 'custom'>, string> = { month: 'per month', quarter: 'every 3 months', half_year: 'every 6 months', year: 'per year' };
   return labels[duration] ?? 'per year';
 }
-export function rentMonthlyEquivalent(amount: number, duration: PropertyRecord['rentDuration']): number {
+export function rentMonthlyEquivalent(amount: number, duration: PropertyRecord['rentDuration'], customMonths?: number): number {
   if (!Number.isFinite(amount) || amount < 0) return 0;
-  return amount / rentPeriodMonths(duration);
+  return amount / rentPeriodMonths(duration, customMonths);
 }
 export function summarizeCosts(property: PropertyRecord | null, costs: PropertyCost[]) {
   if (!property) return null;
@@ -23,7 +27,7 @@ export function summarizeCosts(property: PropertyRecord | null, costs: PropertyC
     if (cost.frequency === 'yearly') return sum + cost.amount / 12;
     return sum;
   }, 0);
-  const rentMonthly = rentMonthlyEquivalent(property.rentAmount, property.rentDuration);
+  const rentMonthly = rentMonthlyEquivalent(property.rentAmount, property.rentDuration, property.rentPeriodMonths);
   const rentDueNow = property.rentAmount;
   return { rentMonthly, rentDueNow, upfrontTotal, refundableUpfront, nonRefundableUpfront, recurringMonthly, cashDueAtStart: rentDueNow + upfrontTotal, monthlyEquivalentTotal: rentMonthly + recurringMonthly };
 }
