@@ -1,0 +1,23 @@
+{
+  "name": "Before you rent",
+  "short_name": "Before you rent",
+  "description": "Inspect a rental, track costs and questions, and compare properties before committing.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#294d3b",
+  "lang": "en-NG",
+  "categories": [
+    "utilities",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
