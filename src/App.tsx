@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowDownRight, ArrowLeft, ArrowRight, Banknote, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, CircleHelp, ClipboardCheck, Clock3, FileText, Home, House, ListChecks, MapPin, Menu, Plus, Search, ShieldCheck, SlidersHorizontal, Sparkles, Trash2, Wallet, X } from 'lucide-react';
 import { deleteProperty, getAnswers, getCosts, getNotes, getProperties, removeCost, removeNote, saveAnswer, saveCost, saveNote, saveProperty } from './db';
-import { CHECKLIST, type CheckStatus, type InspectionAnswer, type PropertyRecord } from './types';
+import { CHECKLIST, type CheckStatus, type InspectionAnswer, type InspectionNote, type PropertyCost, type PropertyRecord } from './types';
 
 type View = 'overview' | 'properties' | 'inspection' | 'costs' | 'compare' | 'settings';
 const money = (amount: number) => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
@@ -79,6 +79,27 @@ export default function App() {
   }
   function navigate(next: View) { setView(next); setMobileNav(false); }
   function startInspection(property: PropertyRecord) { setActiveId(property.id); setView('inspection'); }
+  async function importData(file: File) {
+    try {
+      const parsed = JSON.parse(await file.text()) as { schemaVersion?: number; properties?: PropertyRecord[]; details?: Array<{ id: string; answers?: InspectionAnswer[]; costs?: PropertyCost[]; notes?: InspectionNote[] }> };
+      if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.properties) || !Array.isArray(parsed.details)) throw new Error('This is not a supported Before You Rent backup.');
+      if (!parsed.properties.every(p => p && typeof p.id === 'string' && typeof p.name === 'string' && typeof p.address === 'string')) throw new Error('The backup contains an invalid property record.');
+      if (!window.confirm('Import ' + parsed.properties.length + ' properties? This merges the backup into this browser. Matching IDs will be overwritten; unrelated records will remain.')) return;
+      for (const property of parsed.properties) await saveProperty(property);
+      for (const detail of parsed.details) {
+        if (!detail || typeof detail.id !== 'string') continue;
+        for (const answer of detail.answers ?? []) await saveAnswer(answer);
+        for (const cost of detail.costs ?? []) await saveCost(cost);
+        for (const note of detail.notes ?? []) await saveNote(note);
+      }
+      await refresh();
+      setToast('Backup imported. Review the merged records before relying on them.');
+      window.setTimeout(() => setToast(''), 3500);
+    } catch (e) {
+      setError(e instanceof Error ? 'Import failed: ' + e.message : 'Import failed. Check that the file is a valid Before You Rent JSON backup.');
+    }
+  }
+
   function exportData() {
     Promise.all([getProperties(), ...properties.map(async p => ({ id:p.id, answers:await getAnswers(p.id), costs:await getCosts(p.id), notes:await getNotes(p.id) }))]).then(([records, ...details]) => {
       const payload = { schemaVersion: 1, exportedAt: new Date().toISOString(), properties: records, details };
@@ -115,7 +136,7 @@ export default function App() {
           {view === 'inspection' && <InspectionView active={active} answers={answers} onCreate={() => setShowCreate(true)} onAnswer={updateAnswer} onBack={() => navigate('properties')} onDelete={removeActive}/>}
           {view === 'costs' && <CostsView active={active} onCreate={() => setShowCreate(true)}/>}
           {view === 'compare' && <CompareView properties={properties} onOpen={startInspection} onCreate={() => setShowCreate(true)}/>}
-          {view === 'settings' && <SettingsView onExport={exportData} count={properties.length}/>}
+          {view === 'settings' && <SettingsView onExport={exportData} onImport={importData} count={properties.length}/>}
         </>}
       </div>
       <footer className="page-footer"><span>BEFORE YOU RENT <span className="footer-dot">•</span> MAKE A BETTER-INFORMED MOVE</span><span>Information tool, not a property safety certification.</span></footer>
@@ -195,4 +216,4 @@ function CostsView({active,onCreate}:{active:PropertyRecord|null;onCreate:()=>vo
 
 function CompareView({properties,onOpen,onCreate}:{properties:PropertyRecord[];onOpen:(p:PropertyRecord)=>void;onCreate:()=>void}) { return <><PageHeading eyebrow="A CLEARER SIDE-BY-SIDE" title="Compare your options" description="Compare what you know, what you still need to ask, and what each property will cost." action={<button className="button-primary" onClick={onCreate}><Plus size={17}/> Add property</button>}/>{properties.length<2?<div className="empty-state"><div className="empty-illustration"><SlidersHorizontal size={30}/></div><h3>Two properties make a comparison.</h3><p>Add at least two places to compare rent, location, property type, and inspection progress side by side.</p><button className="button-primary" onClick={onCreate}><Plus size={17}/> Add property</button></div>:<div className="compare-table-wrap"><table className="compare-table"><thead><tr><th>DETAIL</th>{properties.map(p=><th key={p.id}><button className="compare-property-name" onClick={()=>onOpen(p)}>{p.name}<ArrowUpRightFallback/></button><small>{p.address}</small></th>)}</tr></thead><tbody><tr><th>Advertised rent</th>{properties.map(p=><td key={p.id}><strong>{money(p.rentAmount)}</strong><small>per {p.rentDuration}</small></td>)}</tr><tr><th>Property type</th>{properties.map(p=><td key={p.id}>{p.propertyType}</td>)}</tr><tr><th>Bedrooms</th>{properties.map(p=><td key={p.id}>{p.bedrooms===0?'Studio':p.bedrooms}</td>)}</tr><tr><th>Viewing date</th>{properties.map(p=><td key={p.id}>{shortDate(p.inspectionDate)}</td>)}</tr><tr><th>Inspection record</th>{properties.map(p=><td key={p.id}><button className="table-action" onClick={()=>onOpen(p)}>Open inspection <ArrowRight size={14}/></button></td>)}</tr></tbody></table><p className="small-disclaimer">This comparison shows the property details currently recorded. Add fees and complete inspections before relying on it to decide.</p></div>}</>; }
 function ArrowUpRightFallback() { return <ArrowRight size={14}/>; }
-function SettingsView({onExport,count}:{onExport:()=>void;count:number}) { return <><PageHeading eyebrow="PRIVACY AND PRACTICALITIES" title="Your data, your call." description="Understand where your records live and how to keep a copy."/><div className="settings-grid"><section className="panel settings-panel"><span className="settings-icon"><ShieldCheck size={22}/></span><h2>Stored on this device</h2><p>Your property records, checklist responses, costs, and notes are saved in this browser using IndexedDB. There is no account or cloud sync in this version.</p><ul><li>Other browsers and devices will not automatically have your records.</li><li>Clearing browser data may remove your records.</li><li>Anyone with access to this browser profile may be able to view them.</li></ul><button className="button-primary" onClick={onExport}><FileText size={16}/> Export a backup (.json)</button></section><section className="panel settings-panel"><span className="settings-icon"><ClipboardCheck size={22}/></span><h2>What this tool can’t verify</h2><p>Before You Rent is a decision-support tool, not an inspection certificate, legal service, or landlord verification service.</p><ul><li>It cannot guarantee structural safety or detect hidden defects.</li><li>It cannot confirm a person's authority to rent a property.</li><li>It cannot replace professional building, legal, or financial advice.</li></ul><span className="settings-count">{count} {count===1?'property':'properties'} currently saved in this browser</span></section></div><div className="bottom-note"><div className="note-icon"><CircleHelp size={19}/></div><p><b>Back up before switching devices.</b> Export creates a JSON file containing the records currently stored in this browser. Keep it somewhere private and secure.</p></div></>; }
+function SettingsView({onExport,onImport,count}:{onExport:()=>void;onImport:(file:File)=>void;count:number}) {
