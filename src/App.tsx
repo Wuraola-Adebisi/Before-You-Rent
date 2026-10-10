@@ -93,7 +93,7 @@ function WorkspaceApp() {
   async function importData(file: File) {
     try {
       if (file.size > 50 * 1024 * 1024) throw new Error('Backup file is larger than 50 MB.');
-      const parsed = JSON.parse(await file.text()) as { schemaVersion?: number; properties?: PropertyRecord[]; details?: Array<{ id: string; answers?: InspectionAnswer[]; costs?: PropertyCost[]; notes?: InspectionNote[]; photos?: Array<Omit<InspectionPhoto,'blob'> & {blob:string}> }> };
+      const parsed = JSON.parse(await file.text()) as { schemaVersion: number; properties: PropertyRecord[]; details: Array<{ id: string; answers: InspectionAnswer[]; costs: PropertyCost[]; notes: InspectionNote[]; photos: Array<Omit<InspectionPhoto,'blob'> & {blob:string}> }> };
       const validationError = validateBackupPayload(parsed);
       if (validationError) throw new Error(validationError);
       if (!window.confirm('Import ' + parsed.properties.length + ' properties? This merges the backup into this browser. Matching IDs will be overwritten; unrelated records will remain. Photo evidence is included.')) return;
