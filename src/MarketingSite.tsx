@@ -17,7 +17,7 @@ import { useState } from "react";
 import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = "hello@beforeyourent.com";
+const email = "hello@usebeforeyourent.com";
 
 function Brand() {
   return (

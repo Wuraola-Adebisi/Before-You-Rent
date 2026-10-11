@@ -5,7 +5,7 @@ Description: Optional, authenticated cloud backup for Before you rent. Does not 
 Parameters:
   AppOrigin:
     Type: String
-    Default: https://before-you-rent.vercel.app
+    Default: https://usebeforeyourent.com
     Description: Exact HTTPS origin allowed to call the API and upload backups.
 
 Globals:

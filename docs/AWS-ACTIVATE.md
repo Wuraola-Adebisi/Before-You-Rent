@@ -25,7 +25,7 @@ The API derives the S3 object key from the authenticated Cognito subject. The br
 
 1. Install the AWS SAM CLI and configure an AWS account/profile with permission to create the stack.
 2. From the repository root, run `sam build --template-file infra/template.yaml`.
-3. Deploy with `sam deploy --guided --template-file infra/template.yaml`. Set `AppOrigin` to the exact deployed origin (for example, `https://before-you-rent.vercel.app`).
+3. Deploy with `sam deploy --guided --template-file infra/template.yaml`. Set `AppOrigin` to the exact deployed origin (for example, `https://usebeforeyourent.com`).
 4. Copy the stack outputs into Vercel project environment variables:
    - `VITE_AWS_REGION` = `AwsRegion`
    - `VITE_COGNITO_USER_POOL_ID` = `CognitoUserPoolId`

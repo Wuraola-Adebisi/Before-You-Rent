@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://before-you-rent.vercel.app/sitemap.xml
+Sitemap: https://usebeforeyourent.com/sitemap.xml

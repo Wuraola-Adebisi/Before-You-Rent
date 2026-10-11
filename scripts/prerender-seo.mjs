@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 const outputDir = join(process.cwd(), 'dist');
 const template = await readFile(join(outputDir, 'index.html'), 'utf8');
-const site = 'https://before-you-rent.vercel.app';
+const site = 'https://usebeforeyourent.com';
 
 const pages = {
   '/inspection-checklist': {
