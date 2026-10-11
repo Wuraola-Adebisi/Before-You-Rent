@@ -770,7 +770,7 @@ function LegalPage({ path }: { path: string }) {
             <h2>Contact</h2>
             <p>
               Questions about these terms can be sent to{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {email}.
             </p>
           </>
         ) : (
@@ -781,7 +781,7 @@ function LegalPage({ path }: { path: string }) {
             </p>
             <p>
               For product questions and feedback, email{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {email}.
             </p>
             <p>
               Before you rent is currently a decision-support tool. It does not
