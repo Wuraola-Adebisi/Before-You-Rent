@@ -345,3 +345,43 @@ p{font-size:16px;line-height:1.75}
   .cloud-actions { display: grid; grid-template-columns: 1fr; }
   .cloud-actions button { width: 100%; }
 }
+
+/* Keep button labels readable across hover, focus and pressed states. */
+.site-nav > a.site-nav-cta:hover,
+.site-nav > a.site-nav-cta:focus-visible,
+.site-nav > a.site-nav-cta:active,
+.site-button-primary:hover,
+.site-button-primary:focus-visible,
+.site-button-primary:active {
+  color: #fff;
+  background: #1e3e2e;
+}
+.site-button-light:hover,
+.site-button-light:focus-visible,
+.site-button-light:active {
+  color: #294d3b;
+  background: #e7e1d3;
+}
+.button-primary:hover,
+.button-primary:focus-visible,
+.button-primary:active {
+  color: #fff;
+  background: #1f3e2e;
+}
+.button-secondary:hover,
+.button-secondary:focus-visible,
+.button-secondary:active {
+  color: #252b23;
+  background: #f0f1e9;
+}
+.nav-item:hover:not(:disabled),
+.nav-item:focus-visible,
+.nav-item.nav-active {
+  color: #244b37;
+}
+.status-option.status-selected,
+.status-option.status-selected:hover,
+.status-option.status-selected:focus-visible,
+.status-option.status-selected:active {
+  font-weight: 700;
+}
