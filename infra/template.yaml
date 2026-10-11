@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Optional, authenticated cloud backup for Before you rent. Does not deploy the frontend.
+
+Parameters:
+  AppOrigin:
+    Type: String
+    Default: https://before-you-rent.vercel.app
+    Description: Exact HTTPS origin allowed to call the API and upload backups.
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 256
+    Tracing: Active
+
+Resources:
+  RentalBackupBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - !Ref AppOrigin
+            AllowedMethods: [GET, PUT, HEAD]
+            AllowedHeaders: [content-type]
+            ExposedHeaders: [ETag, Last-Modified, Content-Length]
+            MaxAge: 3600
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireIncompleteMultipartUploads
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+
+  RentalBackupUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-users"
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 7
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+      UserPoolTier: ESSENTIALS
+
+  RentalBackupUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: before-you-rent-web
+      UserPoolId: !Ref RentalBackupUserPool
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      EnableTokenRevocation: true
+
+  RentalBackupApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AppOrigin
+        AllowMethods: [GET, PUT, DELETE, OPTIONS]
+        AllowHeaders: [authorization, content-type]
+        MaxAge: 3600
+      Auth:
+        Authorizers:
+          UserPoolJwt:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${RentalBackupUserPool}"
+              audience:
+                - !Ref RentalBackupUserPoolClient
+        DefaultAuthorizer: UserPoolJwt
+
+  RentalBackupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: backup-handler.handler
+      Runtime: nodejs22.x
+      Environment:
+        Variables:
+          BACKUP_BUCKET: !Ref RentalBackupBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref RentalBackupBucket
+      Events:
+        GetBackup:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RentalBackupApi
+            Path: /backup
+            Method: GET
+        PrepareBackupUpload:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RentalBackupApi
+            Path: /backup
+            Method: PUT
+        DeleteBackup:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RentalBackupApi
+            Path: /backup
+            Method: DELETE
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base URL for the authenticated cloud backup API.
+    Value: !Sub "https://${RentalBackupApi}.execute-api.${AWS::Region}.amazonaws.com"
+  CognitoUserPoolId:
+    Description: Cognito user pool ID for frontend configuration.
+    Value: !Ref RentalBackupUserPool
+  CognitoUserPoolClientId:
+    Description: Public Cognito app client ID; no client secret is created.
+    Value: !Ref RentalBackupUserPoolClient
+  AwsRegion:
+    Description: Region where the backup resources were deployed.
+    Value: !Ref AWS::Region

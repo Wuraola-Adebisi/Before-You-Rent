@@ -316,3 +316,32 @@ p{font-size:16px;line-height:1.75}
  .home-shortcut span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
  .topbar-right{gap:7px}
 }
+
+
+/* Optional cloud backup */
+.cloud-backup-panel { grid-column: 1 / -1; }
+.cloud-backup-panel > p { max-width: 780px; }
+.cloud-config-notice, .cloud-privacy-note, .cloud-notice { border: 1px solid var(--line, #dcded5); background: var(--surface-soft, #f7f6ef); border-radius: 12px; padding: 14px 16px; margin: 16px 0; }
+.cloud-config-notice p { margin: 7px 0 0; }
+.cloud-privacy-note { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; }
+.cloud-auth-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 760px; margin-top: 18px; }
+.cloud-auth-form label { display: grid; gap: 7px; font-size: .9rem; font-weight: 600; }
+.cloud-auth-form input { width: 100%; min-width: 0; border: 1px solid var(--line, #dcded5); border-radius: 9px; padding: 12px; background: white; color: #222; font: inherit; }
+.cloud-auth-form button { justify-self: start; display: inline-flex; align-items: center; gap: 8px; }
+.cloud-auth-switch { margin-top: 12px; }
+.cloud-auth-switch button { border: 0; padding: 4px 0; color: var(--ink-green, #315d4a); text-decoration: underline; background: transparent; cursor: pointer; font: inherit; }
+.cloud-signed-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 18px 0; }
+.cloud-signed-in > span { display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.cloud-signed-in .online-dot { display: inline-block; flex: 0 0 auto; }
+.cloud-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.cloud-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.cloud-last-backup, .cloud-caveat { color: var(--muted, #686b63); font-size: .86rem; }
+.cloud-caveat { margin-top: 18px; line-height: 1.6; }
+.cloud-notice { color: var(--ink-green, #315d4a); }
+.cloud-backup-panel .alert-error { margin-top: 14px; }
+.cloud-actions button:disabled, .cloud-auth-form button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 640px) {
+  .cloud-auth-form { grid-template-columns: 1fr; }
+  .cloud-actions { display: grid; grid-template-columns: 1fr; }
+  .cloud-actions button { width: 100%; }
+}
