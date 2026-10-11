@@ -18,7 +18,7 @@ import { useState } from "react";
 import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = "the.wuraola.adebisi@gmail.com";
+const email = "Contact email to be added";
 
 function Brand() {
   return (
@@ -353,85 +353,39 @@ function Landing() {
             </div>
           </div>
         </section>
-        <section className="example-section">
-          <div className="example-heading">
-            <div>
-              <span className="section-eyebrow">A REALISTIC EXAMPLE</span>
-              <h2>One shortlist. A better comparison.</h2>
-            </div>
+        <section className="comparison-value-section">
+          <div className="section-intro">
+            <span className="section-eyebrow">MAKE THE DETAILS COUNT</span>
+            <h2>Choose with the full picture in view.</h2>
             <p>
-              Imagine you’re choosing between two places. Put the details side
-              by side instead of relying on memory alone.
+              A property can look right on the day and still leave important
+              questions unanswered. Keep your observations, costs, and follow-ups
+              together so you can weigh each option more clearly.
             </p>
           </div>
-          <div className="example-comparison">
-            <div className="example-property">
-              <div className="example-property-art example-art-one">
-                <div className="example-mini-house">
-                  <i />
-                  <b />
-                  <span />
-                </div>
-                <span className="example-tag">OPTION A</span>
-              </div>
-              <div className="example-property-body">
-                <span className="example-area">
-                  <MapPin size={14} /> Yaba, Lagos
-                </span>
-                <h3>Flat near the main road</h3>
-                <div className="example-price">
-                  ₦1,800,000 <small>/ year</small>
-                </div>
-                <div className="example-detail">
-                  <span>Upfront fees</span>
-                  <b>₦260,000</b>
-                </div>
-                <div className="example-detail">
-                  <span>Follow-up questions</span>
-                  <b>3 to resolve</b>
-                </div>
-                <div className="example-property-note">
-                  <span className="example-note-dot note-dot-amber" /> Ask about
-                  road noise and the extra fees.
-                </div>
-              </div>
-            </div>
-            <div className="example-property">
-              <div className="example-property-art example-art-two">
-                <div className="example-mini-house">
-                  <i />
-                  <b />
-                  <span />
-                </div>
-                <span className="example-tag">OPTION B</span>
-              </div>
-              <div className="example-property-body">
-                <span className="example-area">
-                  <MapPin size={14} /> Surulere, Lagos
-                </span>
-                <h3>Quiet street apartment</h3>
-                <div className="example-price">
-                  ₦2,100,000 <small>/ year</small>
-                </div>
-                <div className="example-detail">
-                  <span>Upfront fees</span>
-                  <b>₦150,000</b>
-                </div>
-                <div className="example-detail">
-                  <span>Follow-up questions</span>
-                  <b>1 to resolve</b>
-                </div>
-                <div className="example-property-note">
-                  <span className="example-note-dot note-dot-green" /> Confirm
-                  the repair timeline in writing.
-                </div>
-              </div>
-            </div>
+          <div className="steps-grid">
+            <article className="step-card">
+              <span className="step-number">01</span>
+              <div className="step-icon step-icon-green"><ClipboardCheck size={23} /></div>
+              <h3>What you observed</h3>
+              <p>Record visible conditions, mark concerns, and keep photo evidence with the property.</p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">02</span>
+              <div className="step-icon step-icon-peach"><Wallet size={23} /></div>
+              <h3>What it will cost</h3>
+              <p>Separate rent, upfront payments, refundable deposits, and recurring charges.</p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">03</span>
+              <div className="step-icon step-icon-lilac"><FileText size={23} /></div>
+              <h3>What still needs an answer</h3>
+              <p>Keep questions and repair promises visible before you make a commitment.</p>
+              <span className="step-line" />
+            </article>
           </div>
-          <p className="example-disclaimer">
-            Illustrative example only. These are sample figures, not current
-            property listings or market prices.
-          </p>
         </section>
         <section className="questions-section" id="questions">
           <div>
@@ -835,12 +789,7 @@ function LegalPage({ path }: { path: string }) {
               building inspections.
             </p>
             <div className="contact-cta">
-              <a
-                className="site-button site-button-primary"
-                href={"mailto:" + email}
-              >
-                Send an email <ArrowRight size={17} />
-              </a>
+              <span className="contact-email-placeholder">{email}</span>
               <a className="site-text-link" href="/app?start=property">
                 Start an inspection <ArrowRight size={16} />
               </a>
