@@ -17,7 +17,7 @@ import { useState } from "react";
 import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = "Contact email to be added";
+const email = "hello@beforeyourent.com";
 
 function Brand() {
   return (
@@ -428,12 +428,10 @@ function Landing() {
             <details>
               <summary>Where is my information stored?</summary>
               <p>
-                Your working records are saved in this browser. You can
-                optionally create a private cloud backup after signing in, then
-                restore that snapshot on another device. Cloud backup is a
-                manual snapshot, not live sync, and is available only when the
-                service is configured. You can also export a JSON backup at any
-                time.
+                Your records are saved in the browser you use, and you do not need
+                an account. They do not move between devices automatically. You
+                can download a backup file at any time and restore it later or
+                on another device.
               </p>
             </details>
           </div>
@@ -703,7 +701,7 @@ function LegalPage({ path }: { path: string }) {
               plain-language description of how the app works, not legal advice
               and not a statement that the product meets any specific data
               protection law. For questions about this policy, contact{" "}
-              {email}.
+              <a href={`mailto:${email}`}>{email}</a>.
             </p>
           </>
         ) : terms ? (
@@ -731,11 +729,7 @@ function LegalPage({ path }: { path: string }) {
               You are responsible for checking information independently,
               seeking qualified advice when appropriate, and deciding whether to
               proceed with a rental. You are responsible for the accuracy of the
-              records you enter and for keeping exported files and any optional
-              cloud backup secure. A cloud backup is a manual snapshot, not live
-              synchronisation; you must upload updated snapshots yourself.
-              Deleting local records does not delete a cloud backup, and
-              deleting a cloud backup does not delete local records.
+              records you enter and for keeping exported backup files secure.
             </p>
             <h2>Availability and limitations</h2>
             <p>
@@ -753,7 +747,7 @@ function LegalPage({ path }: { path: string }) {
             <h2>Contact</h2>
             <p>
               Questions about these terms can be sent to{" "}
-              {email}.
+              <a href={`mailto:${email}`}>{email}</a>.
             </p>
           </>
         ) : (
@@ -764,7 +758,7 @@ function LegalPage({ path }: { path: string }) {
             </p>
             <p>
               For product questions and feedback, email{" "}
-              {email}.
+              <a href={`mailto:${email}`}>{email}</a>.
             </p>
             <p>
               Before you rent is currently a decision-support tool. It does not
@@ -772,7 +766,9 @@ function LegalPage({ path }: { path: string }) {
               building inspections.
             </p>
             <div className="contact-cta">
-              <span className="contact-email-placeholder">{email}</span>
+              <a className="site-button site-button-primary" href={`mailto:${email}`}>
+                Send an email <ArrowRight size={17} />
+              </a>
               <a className="site-text-link" href="/app?start=property">
                 Start an inspection <ArrowRight size={16} />
               </a>

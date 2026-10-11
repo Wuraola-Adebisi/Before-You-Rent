@@ -199,7 +199,7 @@ p{font-size:16px;line-height:1.75}
 .site-footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid #eeede7;padding:19px 0 22px;color:#8c9186;font-size:12px}
 .site-footer-disclaimer{margin-left:auto;text-align:right}
 .legal-page{width:min(800px,calc(100% - 48px));min-height:65vh;margin:0 auto;padding:60px 0 100px}
-.legal-back{display:inline-flex;align-items:center;gap:7px;color:#5d6f52;text-decoration:none;font-size:14px;font-weight:700;margin-bottom:37px}
+.legal-back{display:flex;width:fit-content;align-items:center;gap:7px;color:#5d6f52;text-decoration:none;font-size:14px;font-weight:700;margin-bottom:37px}
 .legal-back svg{transform:rotate(180deg)}
 .legal-page h1{font:800 clamp(40px,5vw,58px)/1.1 Manrope,sans-serif;letter-spacing:-2.5px;margin:18px 0 8px}
 .legal-updated{font-size:13px;color:#999c92;margin:0 0 36px}
