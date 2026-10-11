@@ -3,9 +3,10 @@ export type CostKind = 'upfront' | 'recurring';
 export type PropertyRecord = {
   id: string; name: string; address: string; propertyType: string; bedrooms: number;
   rentAmount: number; rentDuration: 'year' | 'month' | 'quarter' | 'half_year' | 'custom'; rentPeriodMonths?: number; inspectionDate: string;
-  createdAt: string; updatedAt: string; notes: string;
+  createdAt: string; updatedAt: string; notes: string; personalisedChecklist?: PersonalisedCheck[];
 };
 export type InspectionAnswer = { propertyId: string; itemId: string; status: CheckStatus; note: string; updatedAt: string };
+export type PersonalisedCheck = { id: string; section: string; label: string; help: string; question: string; evidence: string };
 export type PropertyCost = { id: string; propertyId: string; label: string; amount: number; kind: CostKind; refundable: boolean; frequency: 'once' | 'monthly' | 'yearly'; note: string };
 export type InspectionNote = { id: string; propertyId: string; question: string; answer: string; resolved: boolean; createdAt: string };
 export const CHECKLIST = [
