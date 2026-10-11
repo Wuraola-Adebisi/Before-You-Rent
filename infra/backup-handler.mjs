@@ -23,7 +23,6 @@ export const handler = async (event) => {
           Bucket: bucket,
           Key: key,
           ContentType: "application/json",
-          Metadata: { "backup-format": "before-you-rent-json-v1" },
         }),
         { expiresIn: 300 },
       );
