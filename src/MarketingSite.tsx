@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   ClipboardCheck,
   House,
-  MapPin,
   Wallet,
   FileText,
   CircleHelp,
