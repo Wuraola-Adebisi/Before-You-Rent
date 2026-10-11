@@ -187,7 +187,8 @@ export default function CloudBackupPanel() {
       }));
       await importBackupData(payload.properties, details);
       setLastBackup(result.updatedAt ?? '');
-      setNotice(`Restored ${payload.properties.length} properties. Refresh the workspace if the list does not update immediately.`);
+      setNotice(`Restored ${payload.properties.length} properties. Reloading your workspace…`);
+      window.location.reload();
     });
   }
   async function deleteBackup() {
