@@ -1,0 +1,140 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index dde73e1..3d11528 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -11,6 +11,7 @@ jobs:
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 22
+-      - run: npm install
++      - run: npm ci
++      - run: npm run lint
+       - run: npm run build
+       - run: npm test
+diff --git a/eslint.config.js b/eslint.config.js
+new file mode 100644
+index 0000000..8ce38d6
+--- /dev/null
++++ b/eslint.config.js
+@@ -0,0 +1,9 @@
++import js from '@eslint/js';
++import tseslint from 'typescript-eslint';
++
++export default tseslint.config(
++  { ignores: ['dist', 'node_modules', 'infra', 'scripts', 'tests'] },
++  js.configs.recommended,
++  ...tseslint.configs.recommended,
++  { files: ['src/**/*.{ts,tsx}'], languageOptions: { ecmaVersion: 2022 } },
++);
+diff --git a/package.json b/package.json
+index a2ed2ed..6c39d9d 100644
+--- a/package.json
++++ b/package.json
+@@ -11,20 +11,20 @@
+     "preview": "vite preview"
+   },
+   "dependencies": {
+-    "@vitejs/plugin-react": "latest",
++    "@vitejs/plugin-react": "^6.1.2",
+     "idb": "^8.0.3",
+     "lucide-react": "^0.468.0",
+     "react": "^19.0.0",
+     "react-dom": "^19.0.0",
+-    "vite": "latest"
++    "vite": "^8.3.4"
+   },
+   "devDependencies": {
+-    "@eslint/js": "latest",
++    "@eslint/js": "^10.0.1",
+     "@types/react": "^19.0.0",
+     "@types/react-dom": "^19.0.0",
+     "typescript": "~5.7.2",
+-    "typescript-eslint": "latest",
+-    "eslint": "latest",
++    "typescript-eslint": "^8.71.1",
++    "eslint": "^10.12.0",
+     "fake-indexeddb": "^6.2.5"
+   }
+ }
+diff --git a/src/App.tsx b/src/App.tsx
+index 197aaf0..b257e66 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -91,7 +91,7 @@ function WorkspaceApp() {
+     const inspectionDate = String(form.get('inspectionDate') || '');
+     const rentDuration = String(form.get('rentDuration') || 'year') as PropertyRecord['rentDuration'];
+     const customMonths = Number(form.get('rentPeriodMonths'));
+-    if (!name || !address || !Number.isFinite(rentAmount) || rentAmount <= 0 || !Number.isInteger(bedrooms) || bedrooms < 0 || !/^\\d{4}-\\d{2}-\\d{2}$/.test(inspectionDate) || Number.isNaN(Date.parse(inspectionDate + 'T00:00:00')) || (rentDuration === 'custom' && (!Number.isInteger(customMonths) || customMonths < 1 || customMonths > 120))) { setError('Enter a property name, address, positive rent amount, valid bedroom count, viewing date, and a custom rental period between 1 and 120 months if selected.'); return; }
++    if (!name || !address || !Number.isFinite(rentAmount) || rentAmount <= 0 || !Number.isInteger(bedrooms) || bedrooms < 0 || !/^\d{4}-\d{2}-\d{2}$/.test(inspectionDate) || Number.isNaN(Date.parse(inspectionDate + 'T00:00:00')) || (rentDuration === 'custom' && (!Number.isInteger(customMonths) || customMonths < 1 || customMonths > 120))) { setError('Enter a property name, address, positive rent amount, valid bedroom count, viewing date, and a custom rental period between 1 and 120 months if selected.'); return; }
+     const now = new Date().toISOString();
+     const item: PropertyRecord = { ...(editingProperty ?? {} as PropertyRecord), id: editingProperty?.id ?? newId(), name, address, propertyType: String(form.get('propertyType') || 'Flat'), bedrooms, rentAmount, rentDuration, rentPeriodMonths: rentDuration === 'custom' ? customMonths : undefined, inspectionDate, createdAt: editingProperty?.createdAt ?? now, updatedAt: now, notes: String(form.get('notes') || '').trim() };
+     try {
+@@ -215,7 +215,7 @@ function WorkspaceApp() {
+       <div className="page-content">
+         {error && <div className="alert-error" role="alert"><CircleHelp size={17}/><span>{error}</span><button onClick={() => setError('')} aria-label="Dismiss error"><X size={16}/></button></div>}
+         {loading ? <div className="loading-state"><div className="loader"/><p>Opening your workspace…</p></div> : <>
+-          {view === 'overview' && <Overview properties={properties} active={active} answered={answered} concerns={concerns} progress={progress} onCreate={() => setShowCreate(true)} onNavigate={navigate} onOpen={startInspection}/>}
++          {view === 'overview' && <Overview properties={properties} active={active} answered={answered} concerns={concerns} progress={progress} total={allItems.length} onCreate={() => setShowCreate(true)} onNavigate={navigate} onOpen={startInspection}/>}
+           {view === 'properties' && <PropertiesView properties={filtered} search={search} setSearch={setSearch} onCreate={startCreate} onEdit={startEdit} onOpen={startInspection} onDelete={async p => { if(window.confirm('Delete ' + p.name + ' and all its local inspection data?')) { try { await deleteProperty(p.id); await refresh(); } catch { setError('This property and its local records could not be deleted. Try again.'); } } }}/>}
+           {view === 'inspection' && <InspectionView active={active} answers={answers} onCreate={startCreate} onEdit={startEdit} onAnswer={updateAnswer} onSaveChecklist={checks => active ? savePersonalisedChecklist(active.id, checks) : Promise.resolve()} onBack={() => navigate('properties')} onDelete={removeActive}/>}
+           {view === 'costs' && <CostsView active={active} onCreate={startCreate}/>}
+@@ -235,14 +235,14 @@ function NavItem({ active, icon, label, count, onClick, disabled=false }: {activ
+ 
+ function PageHeading({ eyebrow, title, description, action }: {eyebrow:string;title:ReactNode;description:ReactNode;action?:ReactNode}) { return <div className="page-heading"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>{action}</div>; }
+ 
+-function Overview({properties,active,answered,concerns,progress,onCreate,onNavigate,onOpen}:{properties:PropertyRecord[];active:PropertyRecord|null;answered:number;concerns:number;progress:number;onCreate:()=>void;onNavigate:(v:View)=>void;onOpen:(p:PropertyRecord)=>void}) {
++function Overview({properties,active,answered,concerns,progress,total,onCreate,onNavigate,onOpen}:{properties:PropertyRecord[];active:PropertyRecord|null;answered:number;concerns:number;progress:number;total:number;onCreate:()=>void;onNavigate:(v:View)=>void;onOpen:(p:PropertyRecord)=>void}) {
+   const recent = [...properties].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)).slice(0,3);
+   return <><PageHeading eyebrow="YOUR RENTING WORKSPACE" title={<>Find a place. <span className="title-accent">Know what you’re getting.</span></>} description="A calmer way to inspect a rental, get clear on the real cost, and keep your questions in one place." action={<button className="button-primary" onClick={onCreate}><Plus size={17}/> Add property</button>}/>
+     <section className="welcome-banner"><div className="banner-text"><span className="banner-kicker"><Sparkles size={14}/> A LITTLE MORE CERTAINTY</span><h2>Don’t let the viewing be<br/>the only thing you remember.</h2><p>Capture the details while you’re there. Make the decision when you’ve had time to think.</p><button className="banner-link" onClick={() => onNavigate('properties')}>{properties.length ? 'View your properties':'Start with a property'} <ArrowRight size={16}/></button></div><div className="banner-art" aria-hidden="true"><div className="art-sun"/><div className="art-house"><div className="art-roof"/><div className="art-wall"><div className="art-window"/><div className="art-door"/></div></div><div className="art-plant art-plant-one"/><div className="art-plant art-plant-two"/><div className="art-ground"/></div><span className="banner-index">01 / YOUR NEXT MOVE</span></section>
+     <div className="section-head"><div><span className="eyebrow">AT A GLANCE</span><h2>Your renting progress</h2></div><button className="text-link" onClick={() => onNavigate('properties')}>All properties <ArrowRight size={15}/></button></div>
+     <div className="stats-grid"><StatCard icon={<Building2 size={18}/>} label="Properties tracked" value={String(properties.length).padStart(2,'0')} note={properties.length ? 'Your shortlist is taking shape':'Start your shortlist'} tone="cream"/><StatCard icon={<ListChecks size={18}/>} label="Checks completed" value={String(answered).padStart(2,'0')} note={properties.length ? 'Across the selected inspection':'Nothing missed by memory alone'} tone="mint"/><StatCard icon={<ShieldCheck size={18}/>} label="Concerns recorded" value={String(concerns).padStart(2,'0')} note="Worth a second look" tone="peach"/><StatCard icon={<Wallet size={18}/>} label="Move-in costs" value={properties.length ? 'Review':'—'} note="Rent is only part of the picture" tone="lilac" onClick={() => active && onNavigate('costs')}/></div>
+     <div className="content-columns"><section className="panel properties-panel"><div className="panel-head"><div><span className="eyebrow">YOUR SHORTLIST</span><h2>{properties.length ? 'Properties in the mix':'Your first property starts here'}</h2></div><button className="icon-button subtle" onClick={() => onNavigate('properties')} aria-label="View properties"><ArrowRight size={18}/></button></div>{properties.length ? <div className="recent-list">{recent.map((p,i)=><button className="property-row" key={p.id} onClick={() => onOpen(p)}><div className={'property-thumb thumb-' + (i%3)}><House size={23}/><span>{String(i+1).padStart(2,'0')}</span></div><div className="property-row-copy"><b>{p.name}</b><span><MapPin size={13}/>{p.address}</span><small>{p.propertyType} · {p.bedrooms === 0 ? 'Studio' : p.bedrooms + (p.bedrooms===1?' bedroom':' bedrooms')}</small></div><div className="property-row-price"><b>{money(p.rentAmount)}</b><span>{rentPeriodLabel(p.rentDuration,p.rentPeriodMonths).replace('per ','/')}</span><ArrowRight size={15}/></div></button>)}</div>:<div className="empty-shortlist"><div className="empty-illustration"><House size={29}/><Plus size={15}/></div><h3>No properties yet.</h3><p>Start with the place you’re viewing next. Add what you know, then build the rest during the inspection.</p><button className="button-secondary" onClick={onCreate}><Plus size={16}/> Add your first property</button></div>}<button className="panel-bottom-link" onClick={() => onNavigate('properties')}>View property list <ArrowRight size={15}/></button></section>
+-    <section className="panel checklist-panel"><div className="panel-head"><div><span className="eyebrow">THE WALKTHROUGH</span><h2>Inspect with intention.</h2></div><span className="round-icon"><ClipboardCheck size={20}/></span></div><p className="panel-intro">A guided set of checks for the building, utilities, surroundings, and the paperwork behind the deal.</p><div className="progress-block"><div className="progress-label"><span>Inspection progress</span><b>{progress}%</b></div><div className="progress-track"><span style={{width:progress+'%'}}/></div><div className="progress-meta"><span>{answered} of {CHECKLIST.flatMap(s=>s.items).length} checks answered</span><span>{concerns} flagged</span></div></div><div className="checklist-preview"><div><span className="preview-icon"><CheckCircle2 size={16}/></span><span><b>Inside the property</b><small>Structure, water, power, ventilation</small></span></div><div><span className="preview-icon"><Banknote size={16}/></span><span><b>Money and paperwork</b><small>Fees, tenancy terms, receipts</small></span></div><div><span className="preview-icon"><CircleHelp size={16}/></span><span><b>Questions to follow up</b><small>Keep answers with the property</small></span></div></div><button className="button-primary full-width" onClick={() => active ? onNavigate('inspection') : onCreate()}>{active ? 'Continue inspection':'Start with a property'} <ArrowRight size={16}/></button><p className="small-disclaimer">Unchecked means unknown, not approved. Record what you can verify.</p></section></div>
++    <section className="panel checklist-panel"><div className="panel-head"><div><span className="eyebrow">THE WALKTHROUGH</span><h2>Inspect with intention.</h2></div><span className="round-icon"><ClipboardCheck size={20}/></span></div><p className="panel-intro">A guided set of checks for the building, utilities, surroundings, and the paperwork behind the deal.</p><div className="progress-block"><div className="progress-label"><span>Inspection progress</span><b>{progress}%</b></div><div className="progress-track"><span style={{width:progress+'%'}}/></div><div className="progress-meta"><span>{answered} of {total} checks answered</span><span>{concerns} flagged</span></div></div><div className="checklist-preview"><div><span className="preview-icon"><CheckCircle2 size={16}/></span><span><b>Inside the property</b><small>Structure, water, power, ventilation</small></span></div><div><span className="preview-icon"><Banknote size={16}/></span><span><b>Money and paperwork</b><small>Fees, tenancy terms, receipts</small></span></div><div><span className="preview-icon"><CircleHelp size={16}/></span><span><b>Questions to follow up</b><small>Keep answers with the property</small></span></div></div><button className="button-primary full-width" onClick={() => active ? onNavigate('inspection') : onCreate()}>{active ? 'Continue inspection':'Start with a property'} <ArrowRight size={16}/></button><p className="small-disclaimer">Unchecked means unknown, not approved. Record what you can verify.</p></section></div>
+     <div className="bottom-note"><div className="note-icon"><ShieldCheck size={19}/></div><p><b>A note on peace of mind.</b> Before You Rent helps you organise observations and questions. It cannot verify a landlord, guarantee a building’s safety, or replace professional advice.</p><button onClick={() => onNavigate('settings')}>How your data works <ArrowRight size={14}/></button></div>
+   </>;
+ }
+@@ -356,7 +356,7 @@ function CompareView({properties,onOpen,onCreate}:{properties:PropertyRecord[];o
+  <tr><th>Estimated cash due at start</th>{properties.map(p=>{const summary=summarizeCosts(p,details[p.id]?.costs??[]);return <td key={p.id}><strong>{money(summary?.cashDueAtStart??p.rentAmount)}</strong><small>Rent + recorded upfront costs</small></td>})}</tr>
+  <tr><th>Recurring monthly costs</th>{properties.map(p=>{const summary=summarizeCosts(p,details[p.id]?.costs??[]);return <td key={p.id}><strong>{money(summary?.recurringMonthly??0)}</strong><small>Recurring charges only</small></td>})}</tr>
+  <tr><th>Monthly equivalent incl. rent</th>{properties.map(p=>{const summary=summarizeCosts(p,details[p.id]?.costs??[]);return <td key={p.id}><strong>{money((summary?.rentMonthly??rentMonthlyEquivalent(p.rentAmount,p.rentDuration,p.rentPeriodMonths))+(summary?.recurringMonthly??0))}</strong><small>Budget comparison</small></td>})}</tr>
+- <tr><th>Inspection concerns</th>{properties.map(p=>{const a=details[p.id]?.answers??[];return <td key={p.id}><strong className="compare-concern">{a.filter(x=>x.status==='concern').length} flagged</strong><small>{a.filter(x=>x.status==='not_checked').length+(totalChecks-a.length)} unchecked</small></td>})}</tr>
++ <tr><th>Inspection concerns</th>{properties.map(p=>{const a=details[p.id]?.answers??[];return <td key={p.id}><strong className="compare-concern">{a.filter(x=>x.status==='concern').length} flagged</strong><small>{Math.max(0,totalChecks+(p.personalisedChecklist?.length??0)-a.filter(x=>x.status!=='not_checked').length)} unchecked</small></td>})}</tr>
+  <tr><th>Questions still open</th>{properties.map(p=>{const notes=details[p.id]?.notes??[];return <td key={p.id}><strong>{notes.filter(n=>!n.resolved).length}</strong><small>{notes.filter(n=>!n.answer.trim()).length} without an answer</small></td>})}</tr>
+  <tr><th>Unresolved repair promises</th>{properties.map(p=>{const notes=details[p.id]?.notes??[];const repairs=notes.filter(n=>/repair|fix|replace|maintenance|leak|plumb|electric|paint|work/i.test(n.question+' '+n.answer)&&!n.resolved);return <td key={p.id}><strong>{repairs.length}</strong><small>Based on unresolved follow-up notes</small></td>})}</tr>
+  <tr><th>Viewing record</th>{properties.map(p=><td key={p.id}><button className="table-action" onClick={()=>onOpen(p)}>Open inspection <ArrowRight size={14}/></button></td>)}</tr>
+diff --git a/src/backup.ts b/src/backup.ts
+index 693c53c..b6a1c94 100644
+--- a/src/backup.ts
++++ b/src/backup.ts
+@@ -46,7 +46,7 @@ export function validateBackupPayload(value: unknown): string | null {
+       seenNotes.push(note.id as string);
+     }
+     for (const photo of photos) {
+-      if (!isText(photo.id) || photo.propertyId !== id || !isText(photo.name) || !isText(photo.mimeType) || !photo.mimeType.startsWith('image/') || !isText(photo.caption) || (photo.includeInReport !== undefined && typeof photo.includeInReport !== 'boolean') || !validTimestamp(photo.createdAt) || !isText(photo.blob) || !/^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+\/]*={0,2}$/.test(photo.blob)) return 'A photo in the backup is invalid or belongs to another property.';
++      if (!isText(photo.id) || photo.propertyId !== id || !isText(photo.name) || !isText(photo.mimeType) || !photo.mimeType.startsWith('image/') || !isText(photo.caption) || (photo.includeInReport !== undefined && typeof photo.includeInReport !== 'boolean') || !validTimestamp(photo.createdAt) || !isText(photo.blob) || !/^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/]*={0,2}$/.test(photo.blob)) return 'A photo in the backup is invalid or belongs to another property.';
+       seenPhotos.push(photo.id as string);
+     }
+   }
+diff --git a/src/db.ts b/src/db.ts
+index 7cb657a..5e09709 100644
+--- a/src/db.ts
++++ b/src/db.ts
+@@ -10,11 +10,11 @@ interface RentDB extends DBSchema {
+ const DB_NAME = 'before-you-rent';
+ export const dbPromise = openDB<RentDB>(DB_NAME, 2, {
+   upgrade(db) {
+-    const properties = db.createObjectStore('properties', { keyPath: 'id' }); properties.createIndex('by-updated', 'updatedAt');
+-    const answers = db.createObjectStore('answers', { keyPath: ['propertyId', 'itemId'] }); answers.createIndex('by-property', 'propertyId');
+-    const costs = db.createObjectStore('costs', { keyPath: 'id' }); costs.createIndex('by-property', 'propertyId');
+-    const notes = db.objectStoreNames.contains('notes') ? undefined : db.createObjectStore('notes', { keyPath: 'id' }); notes?.createIndex('by-property', 'propertyId');
+-    const photos = db.objectStoreNames.contains('photos') ? undefined : db.createObjectStore('photos', { keyPath: 'id' }); photos?.createIndex('by-property', 'propertyId');
++    if (!db.objectStoreNames.contains('properties')) { const properties = db.createObjectStore('properties', { keyPath: 'id' }); properties.createIndex('by-updated', 'updatedAt'); }
++    if (!db.objectStoreNames.contains('answers')) { const answers = db.createObjectStore('answers', { keyPath: ['propertyId', 'itemId'] }); answers.createIndex('by-property', 'propertyId'); }
++    if (!db.objectStoreNames.contains('costs')) { const costs = db.createObjectStore('costs', { keyPath: 'id' }); costs.createIndex('by-property', 'propertyId'); }
++    if (!db.objectStoreNames.contains('notes')) { const notes = db.createObjectStore('notes', { keyPath: 'id' }); notes.createIndex('by-property', 'propertyId'); }
++    if (!db.objectStoreNames.contains('photos')) { const photos = db.createObjectStore('photos', { keyPath: 'id' }); photos.createIndex('by-property', 'propertyId'); }
+   },
+ });
+ export async function getProperties() { return (await dbPromise).getAllFromIndex('properties', 'by-updated'); }

@@ -10,11 +10,11 @@ interface RentDB extends DBSchema {
 const DB_NAME = 'before-you-rent';
 export const dbPromise = openDB<RentDB>(DB_NAME, 2, {
   upgrade(db) {
-    const properties = db.createObjectStore('properties', { keyPath: 'id' }); properties.createIndex('by-updated', 'updatedAt');
-    const answers = db.createObjectStore('answers', { keyPath: ['propertyId', 'itemId'] }); answers.createIndex('by-property', 'propertyId');
-    const costs = db.createObjectStore('costs', { keyPath: 'id' }); costs.createIndex('by-property', 'propertyId');
-    const notes = db.objectStoreNames.contains('notes') ? undefined : db.createObjectStore('notes', { keyPath: 'id' }); notes?.createIndex('by-property', 'propertyId');
-    const photos = db.objectStoreNames.contains('photos') ? undefined : db.createObjectStore('photos', { keyPath: 'id' }); photos?.createIndex('by-property', 'propertyId');
+    if (!db.objectStoreNames.contains('properties')) { const properties = db.createObjectStore('properties', { keyPath: 'id' }); properties.createIndex('by-updated', 'updatedAt'); }
+    if (!db.objectStoreNames.contains('answers')) { const answers = db.createObjectStore('answers', { keyPath: ['propertyId', 'itemId'] }); answers.createIndex('by-property', 'propertyId'); }
+    if (!db.objectStoreNames.contains('costs')) { const costs = db.createObjectStore('costs', { keyPath: 'id' }); costs.createIndex('by-property', 'propertyId'); }
+    if (!db.objectStoreNames.contains('notes')) { const notes = db.createObjectStore('notes', { keyPath: 'id' }); notes.createIndex('by-property', 'propertyId'); }
+    if (!db.objectStoreNames.contains('photos')) { const photos = db.createObjectStore('photos', { keyPath: 'id' }); photos.createIndex('by-property', 'propertyId'); }
   },
 });
 export async function getProperties() { return (await dbPromise).getAllFromIndex('properties', 'by-updated'); }
