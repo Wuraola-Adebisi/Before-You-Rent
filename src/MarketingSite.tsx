@@ -18,7 +18,7 @@ import { useState } from "react";
 import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = "the.wuraola.adebisi@gmail.com";
+const contactPlaceholder = "Contact details will be added here.";
 
 function Brand() {
   return (
@@ -765,8 +765,7 @@ function LegalPage({ path }: { path: string }) {
               This policy may change as the product develops. It is a
               plain-language description of how the app works, not legal advice
               and not a statement that the product meets any specific data
-              protection law. For questions about this policy, contact{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              protection law. For questions about this policy, {contactPlaceholder.toLowerCase()}.
             </p>
           </>
         ) : terms ? (
@@ -815,8 +814,7 @@ function LegalPage({ path }: { path: string }) {
             </p>
             <h2>Contact</h2>
             <p>
-              Questions about these terms can be sent to{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {contactPlaceholder}
             </p>
           </>
         ) : (
@@ -826,8 +824,7 @@ function LegalPage({ path }: { path: string }) {
               viewing easier to navigate?
             </p>
             <p>
-              For product questions and feedback, email{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {contactPlaceholder}
             </p>
             <p>
               Before you rent is currently a decision-support tool. It does not
@@ -835,14 +832,8 @@ function LegalPage({ path }: { path: string }) {
               building inspections.
             </p>
             <div className="contact-cta">
-              <a
-                className="site-button site-button-primary"
-                href={"mailto:" + email}
-              >
-                Send an email <ArrowRight size={17} />
-              </a>
-              <a className="site-text-link" href="/app?start=property">
-                Start an inspection <ArrowRight size={16} />
+              <a className="site-button site-button-primary" href="/app?start=property">
+                Start an inspection <ArrowRight size={17} />
               </a>
             </div>
           </>
