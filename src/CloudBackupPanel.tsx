@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Cloud, CloudDownload, CloudUpload, LockKeyhole, LogIn, LogOut, RefreshCw, Trash2, UserPlus } from 'lucide-react';
-import { deleteAllData, getAnswers, getCosts, getNotes, getPhotos, getProperties, importBackupData } from './db';
+import { useState, type FormEvent } from 'react';
+import { Cloud, CloudDownload, CloudUpload, LockKeyhole, LogIn, LogOut, Trash2, UserPlus } from 'lucide-react';
+import { getAnswers, getCosts, getNotes, getPhotos, getProperties, importBackupData } from './db';
 import { isBackupFileSizeAllowed, MAX_BACKUP_BYTES, validateBackupPayload } from './backup';
 import type { InspectionAnswer, InspectionNote, InspectionPhoto, PropertyCost, PropertyRecord } from './types';
 
@@ -137,7 +137,7 @@ export default function CloudBackupPanel() {
     catch (e) { setError(e instanceof Error ? e.message : 'Something went wrong. Try again.'); }
     finally { setBusy(false); }
   }
-  async function submitAuth(event: React.FormEvent<HTMLFormElement>) {
+  async function submitAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await run(async () => {
       if (mode === 'signup') {
