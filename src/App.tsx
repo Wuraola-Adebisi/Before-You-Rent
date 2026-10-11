@@ -206,7 +206,7 @@ function WorkspaceApp() {
       <div className="sidebar-bottom">
         
         <button className="nav-item" onClick={() => navigate('settings')}><span className="nav-icon"><CircleHelp size={18}/></span><span>Data & help</span></button>
-        <div className="sidebar-foot"><span className="online-dot"/> PRIVATE BY DEFAULT <span className="version">V0.1</span></div>
+        <div className="sidebar-foot"><span className="online-dot"/> PRIVATE BY DEFAULT </div>
       </div>
     </aside>
     {mobileNav && <button className="mobile-scrim" onClick={() => setMobileNav(false)} aria-label="Close navigation"/>}
