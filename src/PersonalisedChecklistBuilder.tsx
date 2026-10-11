@@ -12,7 +12,7 @@ export default function PersonalisedChecklistBuilder({property,checks,answers,on
  const [selected,setSelected]=useState<string[]>(['Water supply and pressure','Electricity reliability and costs','Flooding and drainage']);
  const [extra,setExtra]=useState(''); const [draft,setDraft]=useState<PersonalisedCheck[]>([]); const [showForm,setShowForm]=useState(checks.length===0);
  const [busy,setBusy]=useState(false); const [error,setError]=useState(''); const [expanded,setExpanded]=useState(true);
- const answersById=useMemo(()=>new Map(answers.map(answer=>[answer.itemId,answer.status])),[answers]);
+ const answersById=useMemo(()=>new Map<string,CheckStatus>(answers.map(answer=>[answer.itemId,answer.status] as const)),[answers]);
  function build(event:FormEvent<HTMLFormElement>){event.preventDefault();const input:ChecklistInputs={propertyType:property.propertyType,bedrooms:property.bedrooms,floor,water,power,priorities:selected,extra};setDraft(generatePersonalisedChecklist(input));setError('');}
  async function saveDraft(){if(!draft.length)return;setBusy(true);setError('');try{await onSave(draft);setDraft([]);setShowForm(false);setExpanded(true)}catch(e){setError(e instanceof Error?e.message:'Could not save these checks. Try again.')}finally{setBusy(false)}}
  return <section className="panel tailored-panel"><div className="panel-head"><div><span className="eyebrow">MADE FOR THIS PROPERTY</span><h2>Build a more relevant checklist</h2></div><span className="round-icon"><Sparkles size={19}/></span></div>
