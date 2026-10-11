@@ -203,7 +203,7 @@ export default function CloudBackupPanel() {
   return <section className="panel settings-panel cloud-backup-panel">
     <span className="settings-icon"><Cloud size={22}/></span>
     <h2>Optional cloud backup</h2>
-    <p>Your working records remain on this device. An account lets you upload one private backup and restore it on another device. This is a manual snapshot, not live sync.</p>
+    <p>Your property details, checklist answers, notes and photos are saved in this browser. You can create an account to keep a backup and restore it on another device. Backups update only when you choose to save one; they are not updated automatically. Deleting your account backup does not delete the copy on this device.</p>
     {!configured ? <div className="cloud-config-notice"><b>Cloud backup is not configured yet.</b><p>Deploy the AWS stack in <code>infra/template.yaml</code>, then add its outputs as Vercel environment variables. Until then, your local records and JSON export continue to work normally.</p></div> : !signedIn ? <>
       <div className="cloud-privacy-note"><LockKeyhole size={17}/><span>Backups are private to your account. Sign-in is handled by Amazon Cognito; files are stored in a private, encrypted S3 bucket.</span></div>
       <form className="cloud-auth-form" onSubmit={submitAuth}>
