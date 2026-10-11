@@ -352,6 +352,61 @@ function Landing() {
             </div>
           </div>
         </section>
+        <section className="feature-section" id="made-for-this-property">
+          <div className="feature-copy">
+            <span className="section-eyebrow">MADE FOR THIS PROPERTY</span>
+            <h2>
+              A checklist that fits
+              <br />
+              the place you are viewing.
+            </h2>
+            <p>
+              Tell the app which floor the flat is on, how water and power are
+              supplied, and what matters most to you. It suggests extra checks
+              and questions for that property.
+            </p>
+            <p>
+              Review the suggestions, add the ones you want, and leave out the
+              rest. They come from a built-in set of rules and what you enter,
+              and they stay in your browser.
+            </p>
+          </div>
+          <div className="checklist-mockup">
+            <div className="mockup-top">
+              <div>
+                <span className="mockup-kicker">SUGGESTED CHECKS</span>
+                <h3>For a top-floor flat</h3>
+              </div>
+              <span className="mockup-count">2 suggested</span>
+            </div>
+            <div className="mock-check">
+              <span className="mock-check-icon">
+                <House size={17} />
+              </span>
+              <div>
+                <b>Ask about roof leaks and ceiling repairs</b>
+                <small>Look for stains, sagging or peeling paint on ceilings.</small>
+              </div>
+              <span className="mock-status">Check</span>
+            </div>
+            <div className="mock-check">
+              <span className="mock-check-icon">
+                <Wallet size={17} />
+              </span>
+              <div>
+                <b>Understand shared meter billing</b>
+                <small>Ask how each household’s share is calculated.</small>
+              </div>
+              <span className="mock-status">Ask</span>
+            </div>
+            <div className="mockup-bottom">
+              <span>
+                <Check size={16} /> You choose which suggestions to add.
+              </span>
+              <ArrowRight size={17} />
+            </div>
+          </div>
+        </section>
         <section className="comparison-value-section">
           <div className="section-intro">
             <span className="section-eyebrow">MAKE THE DETAILS COUNT</span>
