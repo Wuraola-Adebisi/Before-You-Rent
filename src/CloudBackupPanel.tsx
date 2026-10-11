@@ -83,7 +83,7 @@ async function validIdToken(): Promise<string> {
 }
 async function apiRequest(method: 'GET' | 'PUT' | 'DELETE'): Promise<ApiResult> {
   const token = await validIdToken();
-  const response = await fetch(config.apiUrl + '/backup', { method, headers: { Authorization: `Bearer ${token}', ...(method === 'PUT' ? { 'content-type': 'application/json' } : {}) } });
+  const response = await fetch(config.apiUrl + '/backup', { method, headers: { Authorization: `Bearer ${token}`, ...(method === 'PUT' ? { 'content-type': 'application/json' } : {}) } });
   const data = await response.json() as ApiResult;
   if (!response.ok) throw new Error(data.message ?? 'The cloud backup service could not be reached.');
   return data;
