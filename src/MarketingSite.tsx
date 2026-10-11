@@ -655,48 +655,32 @@ function LegalPage({ path }: { path: string }) {
               inspection responses, notes, questions, and photos. These records
               are stored in your browser on the device you are using.
             </p>
-            <h2>Local storage and backups</h2>
+            <h2>Where your records are stored</h2>
             <p>
-              The app uses browser storage to keep your records between visits.
-              The app keeps a working copy in your browser and does not require
-              an account for local use. If optional cloud backup is enabled, you
-              may create an account and explicitly upload a snapshot of your
-              records to a private Amazon S3 bucket. The cloud copy is not live
-              sync; you must upload a new snapshot to update it and restore it
-              separately on another device. Other people who can access your
-              browser profile may be able to access local records there.
-              Clearing browser data, browser failures, or losing access to a
-              device may result in local data loss.
+              Your property details, inspection notes, costs, and photos are
+              saved in the browser you use. You can use the app without creating
+              an account. Records do not automatically move between devices.
             </p>
             <p>
-              If you export a backup, the downloaded JSON file may contain
-              personal notes, property details, and photo evidence. Keep it
-              somewhere private. If you import a backup, its contents are added
-              to or overwrite matching records in the current browser as
-              described in the app.
+              You can download a backup or restore records from a backup file.
+              Keep downloaded files somewhere private, as they may contain
+              personal notes, property details, and photos. You can remove
+              records from the app using its data controls.
             </p>
-            <h2>Third-party services and technical data</h2>
+            <h2>Website services</h2>
             <p>
-              The website loads fonts from Google Fonts, so your browser
-              connects to that service to retrieve font files. The site is
-              hosted through Vercel. The hosting provider may process technical
-              request data such as IP address, browser details, request time,
-              and security or diagnostic logs. The app does not include an
-              analytics SDK. If you choose to use cloud backup when available,
-              account authentication is handled by Amazon Cognito and your
-              backup file is stored in a private Amazon S3 bucket. The cloud
-              service receives the property records and photos included in the
-              snapshot; use it only if you are comfortable storing that
-              information with the service.
+              The website uses Google Fonts and is hosted by Vercel. These
+              providers may receive basic technical information when your
+              browser loads the site. The app does not use analytics to track
+              how you use it.
             </p>
             <h2>Your choices</h2>
             <p>
-              You can choose what to record, export a copy, avoid adding
-              sensitive information, and manage browser data through your
-              browser settings. You can sign out, delete the cloud backup
-              separately, or delete local records from the workspace. Deleting
-              one copy does not delete the other. Use a device and browser
-              profile you trust.
+              Only record information you are comfortable keeping in the app.
+              You can export a copy of your records or delete them from the
+              browser using the app's data controls. If additional backup
+              options become available, information about them will be provided
+              before you choose to use them.
             </p>
             <h2>Privacy rights and concerns</h2>
             <p>
