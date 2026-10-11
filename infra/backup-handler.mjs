@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3 = new S3Client({});
@@ -23,7 +23,6 @@ export const handler = async (event) => {
           Bucket: bucket,
           Key: key,
           ContentType: "application/json",
-          ServerSideEncryption: "AES256",
           Metadata: { "backup-format": "before-you-rent-json-v1" },
         }),
         { expiresIn: 300 },
@@ -36,7 +35,7 @@ export const handler = async (event) => {
         const head = await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
         const downloadUrl = await getSignedUrl(
           s3,
-          new (await import("@aws-sdk/client-s3")).GetObjectCommand({ Bucket: bucket, Key: key }),
+          new GetObjectCommand({ Bucket: bucket, Key: key }),
           { expiresIn: 300 },
         );
         return response(200, { exists: true, downloadUrl, updatedAt: head.LastModified?.toISOString() ?? null, size: head.ContentLength ?? null });
