@@ -1,67 +1,861 @@
-import { ArrowDown, ArrowRight, Check, CheckCircle2, ClipboardCheck, House, MapPin, Wallet, FileText, CircleHelp, ShieldCheck, Menu, X, Building2 } from 'lucide-react';
-import { useState } from 'react';
-import { CHECKLIST } from './types';
+import {
+  ArrowDown,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ClipboardCheck,
+  House,
+  MapPin,
+  Wallet,
+  FileText,
+  CircleHelp,
+  ShieldCheck,
+  Menu,
+  X,
+  Building2,
+} from "lucide-react";
+import { useState } from "react";
+import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = 'the.wuraola.adebisi@gmail.com';
+const email = "the.wuraola.adebisi@gmail.com";
 
 function Brand() {
-  return <a className="site-brand" href="/" aria-label="Before you rent home"><span className="site-brand-mark"><House size={20}/></span><span>Before you <b>rent.</b></span></a>;
+  return (
+    <a className="site-brand" href="/" aria-label="Before you rent home">
+      <span className="site-brand-mark">
+        <House size={20} />
+      </span>
+      <span>
+        Before you <b>rent.</b>
+      </span>
+    </a>
+  );
 }
 function SiteHeader() {
   const [open, setOpen] = useState(false);
-  return <header className="site-header"><div className="site-header-inner"><Brand/><button className="site-menu-toggle" onClick={()=>setOpen(!open)} aria-label={open?'Close menu':'Open menu'}>{open?<X size={22}/>:<Menu size={22}/>}</button><nav className={open?'site-nav site-nav-open':'site-nav'}><a href="/#how-it-works" onClick={()=>setOpen(false)}>How it works</a><a href="/#what-you-can-check" onClick={()=>setOpen(false)}>What you can check</a><a href="/#questions" onClick={()=>setOpen(false)}>FAQs</a><a className="site-nav-cta" href="/app?start=property" onClick={()=>setOpen(false)}>Start an inspection <ArrowRight size={16}/></a></nav></div></header>;
+  return (
+    <header className="site-header">
+      <div className="site-header-inner">
+        <Brand />
+        <button
+          className="site-menu-toggle"
+          onClick={() => setOpen(!open)}
+          aria-label={open ? "Close menu" : "Open menu"}
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <nav className={open ? "site-nav site-nav-open" : "site-nav"}>
+          <a href="/#how-it-works" onClick={() => setOpen(false)}>
+            How it works
+          </a>
+          <a href="/#what-you-can-check" onClick={() => setOpen(false)}>
+            What you can check
+          </a>
+          <a href="/#questions" onClick={() => setOpen(false)}>
+            FAQs
+          </a>
+          <a
+            className="site-nav-cta"
+            href="/app?start=property"
+            onClick={() => setOpen(false)}
+          >
+            Start an inspection <ArrowRight size={16} />
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
 }
 function SiteFooter() {
-  return <footer className="site-footer"><div className="site-footer-main"><div className="site-footer-brand"><Brand/><p>A more considered way to inspect a rental, understand the costs, and make your next move.</p></div><div className="site-footer-links"><div><b>Explore</b><a href="/#how-it-works">How it works</a><a href="/inspection-checklist">Inspection checklist</a><a href="/app?start=property">Start an inspection</a></div><div><b>Information</b><a href="/contact">Contact</a><a href="/privacy">Privacy policy</a><a href="/terms">Terms of use</a></div></div></div><div className="site-footer-bottom"><span>© {new Date().getFullYear()} Before you rent</span><span>Made to help renters ask better questions.</span><span className="site-footer-disclaimer">Not a property safety certification or legal service.</span></div></footer>;
+  return (
+    <footer className="site-footer">
+      <div className="site-footer-main">
+        <div className="site-footer-brand">
+          <Brand />
+          <p>
+            A more considered way to inspect a rental, understand the costs, and
+            make your next move.
+          </p>
+        </div>
+        <div className="site-footer-links">
+          <div>
+            <b>Explore</b>
+            <a href="/#how-it-works">How it works</a>
+            <a href="/inspection-checklist">Inspection checklist</a>
+            <a href="/app?start=property">Start an inspection</a>
+          </div>
+          <div>
+            <b>Information</b>
+            <a href="/contact">Contact</a>
+            <a href="/privacy">Privacy policy</a>
+            <a href="/terms">Terms of use</a>
+          </div>
+        </div>
+      </div>
+      <div className="site-footer-bottom">
+        <span>© {new Date().getFullYear()} Before you rent</span>
+        <span>Made to help renters ask better questions.</span>
+        <span className="site-footer-disclaimer">
+          Not a property safety certification or legal service.
+        </span>
+      </div>
+    </footer>
+  );
 }
 function Landing() {
- return <><SiteHeader/><main className="marketing-page">
-  <section className="hero-section"><div className="hero-copy"><span className="hero-eyebrow"><span/> A smarter way to view a rental</span><h1>Before you rent,<br/><em>look a little closer.</em></h1><p className="hero-description">A property viewing can move quickly. Keep track of what you notice, what you need to ask, and what it will really cost before you commit.</p><div className="hero-actions"><a className="site-button site-button-primary" href="/app?start=property">Start with a property <ArrowRight size={18}/></a><a className="site-text-link" href="#how-it-works">See how it works <ArrowDown size={16}/></a></div><div className="hero-proof"><span><Check size={15}/> Guided property checks</span><span><Check size={15}/> Costs in one place</span><span><Check size={15}/> Side-by-side comparison</span></div></div>
-   <div className="hero-visual" aria-label="Illustration of a rental inspection dashboard"><div className="visual-sun"/><div className="visual-orbit visual-orbit-one"/><div className="visual-orbit visual-orbit-two"/><div className="visual-building"><div className="visual-roof"/><div className="visual-building-face"><div className="visual-window visual-window-one"/><div className="visual-window visual-window-two"/><div className="visual-door"/></div></div><div className="visual-plant visual-plant-a"/><div className="visual-plant visual-plant-b"/><div className="visual-ground"/><div className="visual-note visual-note-check"><span><CheckCircle2 size={17}/></span><div><b>Viewing checklist</b><small>16 practical things to check</small></div></div><div className="visual-note visual-note-cost"><span><Wallet size={17}/></span><div><b>Cost breakdown</b><small>Rent, fees and deposits</small></div></div><div className="visual-label">YOUR NEXT MOVE, CONSIDERED</div></div>
-  </section>
-  <section className="trust-strip"><p>ONE VIEWING AT A TIME</p><div><span><ClipboardCheck size={18}/> Notice the details</span><span><Wallet size={18}/> Understand the money</span><span><FileText size={18}/> Keep the evidence</span><span><Building2 size={18}/> Compare your options</span></div></section>
-  <section className="section-how" id="how-it-works"><div className="section-intro"><span className="section-eyebrow">A SIMPLE PROCESS</span><h2>From viewing to a<br/><em>clearer decision.</em></h2><p>Use it while you’re at the property, then come back to your notes when you have room to think.</p></div><div className="steps-grid"><article className="step-card"><span className="step-number">01</span><div className="step-icon step-icon-green"><House size={23}/></div><h3>Add the property</h3><p>Record the address, rent, property type, and viewing date. Start with what you already know.</p><span className="step-line"/></article><article className="step-card"><span className="step-number">02</span><div className="step-icon step-icon-peach"><ClipboardCheck size={23}/></div><h3>Inspect and ask</h3><p>Work through practical checks, flag concerns, save photos, and keep follow-up questions together.</p><span className="step-line"/></article><article className="step-card"><span className="step-number">03</span><div className="step-icon step-icon-lilac"><Wallet size={23}/></div><h3>Review the full picture</h3><p>Break down rent and additional fees, then compare what you’ve learned about each place.</p><span className="step-line"/></article></div></section>
-  <section className="feature-section" id="what-you-can-check"><div className="feature-copy"><span className="section-eyebrow">MORE THAN A QUICK LOOK</span><h2>Remember the things<br/>that are easy to miss.</h2><p>When you’re viewing a place, there’s a lot to take in. Use a guided checklist to give each part of the decision some attention.</p><ul className="feature-list"><li><CheckCircle2 size={18}/><span><b>Building and utilities</b><small>Visible cracks, damp, water flow, drainage, sockets, and ventilation.</small></span></li><li><CheckCircle2 size={18}/><span><b>Surroundings and daily life</b><small>Noise, mobile reception, access roads, and signs of poor drainage.</small></span></li><li><CheckCircle2 size={18}/><span><b>Questions before payment</b><small>Fees, tenancy terms, repair promises, receipts, and who receives payment.</small></span></li></ul><a className="site-text-link" href="/inspection-checklist">Explore the inspection checklist <ArrowRight size={16}/></a></div><div className="checklist-mockup"><div className="mockup-top"><div><span className="mockup-kicker">PROPERTY INSPECTION</span><h3>Viewing checklist</h3></div><span className="mockup-count">01 / 04</span></div><div className="mockup-progress"><span/></div><p className="mockup-progress-label">A few checks to guide your walkthrough</p><div className="mock-check"><span className="mock-check-icon"><House size={17}/></span><div><b>Visible cracks or damp</b><small>Look at corners, ceilings and window edges.</small></div><span className="mock-status">Check</span></div><div className="mock-check"><span className="mock-check-icon"><Wallet size={17}/></span><div><b>Water supply and pressure</b><small>Run taps and ask how reliable it is.</small></div><span className="mock-status">Check</span></div><div className="mock-check"><span className="mock-check-icon"><ShieldCheck size={17}/></span><div><b>Fees and payment details</b><small>Request a written breakdown before paying.</small></div><span className="mock-status">Ask</span></div><div className="mockup-bottom"><span><CircleHelp size={16}/> Unknown is not the same as okay.</span><ArrowRight size={17}/></div></div></section>
-  <section className="example-section"><div className="example-heading"><div><span className="section-eyebrow">A REALISTIC EXAMPLE</span><h2>One shortlist. A better comparison.</h2></div><p>Imagine you’re choosing between two places. Put the details side by side instead of relying on memory alone.</p></div><div className="example-comparison"><div className="example-property"><div className="example-property-art example-art-one"><div className="example-mini-house"><i/><b/><span/></div><span className="example-tag">OPTION A</span></div><div className="example-property-body"><span className="example-area"><MapPin size={14}/> Yaba, Lagos</span><h3>Flat near the main road</h3><div className="example-price">₦1,800,000 <small>/ year</small></div><div className="example-detail"><span>Upfront fees</span><b>₦260,000</b></div><div className="example-detail"><span>Follow-up questions</span><b>3 to resolve</b></div><div className="example-property-note"><span className="example-note-dot note-dot-amber"/> Ask about road noise and the extra fees.</div></div></div><div className="example-property"><div className="example-property-art example-art-two"><div className="example-mini-house"><i/><b/><span/></div><span className="example-tag">OPTION B</span></div><div className="example-property-body"><span className="example-area"><MapPin size={14}/> Surulere, Lagos</span><h3>Quiet street apartment</h3><div className="example-price">₦2,100,000 <small>/ year</small></div><div className="example-detail"><span>Upfront fees</span><b>₦150,000</b></div><div className="example-detail"><span>Follow-up questions</span><b>1 to resolve</b></div><div className="example-property-note"><span className="example-note-dot note-dot-green"/> Confirm the repair timeline in writing.</div></div></div></div><p className="example-disclaimer">Illustrative example only. These are sample figures, not current property listings or market prices.</p></section>
-  <section className="questions-section" id="questions"><div><span className="section-eyebrow">GOOD TO KNOW</span><h2>Questions, answered.</h2><p>Clear expectations make for better decisions.</p></div><div className="faq-list"><details><summary>Does Before you rent find properties for me?</summary><p>No. It helps you assess and compare places you’ve already found. It is not a property marketplace or agent directory.</p></details><details><summary>Does it verify a landlord or certify a property as safe?</summary><p>No. It helps you organise observations and questions. It cannot verify identity, ownership, authority to rent, or hidden building defects.</p></details><details><summary>What costs can I record?</summary><p>You can record rent, one-off fees, refundable deposits, and recurring charges so the upfront and ongoing costs are easier to review.</p></details><details><summary>Can I compare more than one property?</summary><p>Yes. Add multiple properties, record what you learn about each one, and open the comparison view in the app.</p></details><details><summary>Where is my information stored?</summary><p>Your working records are saved in this browser. You can optionally create a private cloud backup after signing in, then restore that snapshot on another device. Cloud backup is a manual snapshot, not live sync, and is available only when the service is configured. You can also export a JSON backup at any time.</p></details></div></section>
-  <section className="closing-cta"><div className="closing-cta-art"><span/><span/><span/></div><div><span className="section-eyebrow">YOUR NEXT VIEWING</span><h2>Go in with better questions.</h2><p>Make room to notice the details before you make a commitment.</p><a className="site-button site-button-light" href="/app?start=property">Start your shortlist <ArrowRight size={17}/></a></div></section>
- </main><SiteFooter/></>;
+  return (
+    <>
+      <SiteHeader />
+      <main className="marketing-page">
+        <section className="hero-section">
+          <div className="hero-copy">
+            <span className="hero-eyebrow">
+              <span /> A smarter way to view a rental
+            </span>
+            <h1>
+              Before you rent,
+              <br />
+              <em>look a little closer.</em>
+            </h1>
+            <p className="hero-description">
+              A property viewing can move quickly. Keep track of what you
+              notice, what you need to ask, and what it will really cost before
+              you commit.
+            </p>
+            <div className="hero-actions">
+              <a
+                className="site-button site-button-primary"
+                href="/app?start=property"
+              >
+                Start with a property <ArrowRight size={18} />
+              </a>
+              <a className="site-text-link" href="#how-it-works">
+                See how it works <ArrowDown size={16} />
+              </a>
+            </div>
+            <div className="hero-proof">
+              <span>
+                <Check size={15} /> Guided property checks
+              </span>
+              <span>
+                <Check size={15} /> Costs in one place
+              </span>
+              <span>
+                <Check size={15} /> Side-by-side comparison
+              </span>
+            </div>
+          </div>
+          <div
+            className="hero-visual"
+            aria-label="Illustration of a rental inspection dashboard"
+          >
+            <div className="visual-sun" />
+            <div className="visual-orbit visual-orbit-one" />
+            <div className="visual-orbit visual-orbit-two" />
+            <div className="visual-building">
+              <div className="visual-roof" />
+              <div className="visual-building-face">
+                <div className="visual-window visual-window-one" />
+                <div className="visual-window visual-window-two" />
+                <div className="visual-door" />
+              </div>
+            </div>
+            <div className="visual-plant visual-plant-a" />
+            <div className="visual-plant visual-plant-b" />
+            <div className="visual-ground" />
+            <div className="visual-note visual-note-check">
+              <span>
+                <CheckCircle2 size={17} />
+              </span>
+              <div>
+                <b>Viewing checklist</b>
+                <small>16 practical things to check</small>
+              </div>
+            </div>
+            <div className="visual-note visual-note-cost">
+              <span>
+                <Wallet size={17} />
+              </span>
+              <div>
+                <b>Cost breakdown</b>
+                <small>Rent, fees and deposits</small>
+              </div>
+            </div>
+            <div className="visual-label">YOUR NEXT MOVE, CONSIDERED</div>
+          </div>
+        </section>
+        <section className="trust-strip">
+          <p>ONE VIEWING AT A TIME</p>
+          <div>
+            <span>
+              <ClipboardCheck size={18} /> Notice the details
+            </span>
+            <span>
+              <Wallet size={18} /> Understand the money
+            </span>
+            <span>
+              <FileText size={18} /> Keep the evidence
+            </span>
+            <span>
+              <Building2 size={18} /> Compare your options
+            </span>
+          </div>
+        </section>
+        <section className="section-how" id="how-it-works">
+          <div className="section-intro">
+            <span className="section-eyebrow">A SIMPLE PROCESS</span>
+            <h2>
+              From viewing to a<br />
+              <em>clearer decision.</em>
+            </h2>
+            <p>
+              Use it while you’re at the property, then come back to your notes
+              when you have room to think.
+            </p>
+          </div>
+          <div className="steps-grid">
+            <article className="step-card">
+              <span className="step-number">01</span>
+              <div className="step-icon step-icon-green">
+                <House size={23} />
+              </div>
+              <h3>Add the property</h3>
+              <p>
+                Record the address, rent, property type, and viewing date. Start
+                with what you already know.
+              </p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">02</span>
+              <div className="step-icon step-icon-peach">
+                <ClipboardCheck size={23} />
+              </div>
+              <h3>Inspect and ask</h3>
+              <p>
+                Work through practical checks, flag concerns, save photos, and
+                keep follow-up questions together.
+              </p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">03</span>
+              <div className="step-icon step-icon-lilac">
+                <Wallet size={23} />
+              </div>
+              <h3>Review the full picture</h3>
+              <p>
+                Break down rent and additional fees, then compare what you’ve
+                learned about each place.
+              </p>
+              <span className="step-line" />
+            </article>
+          </div>
+        </section>
+        <section className="feature-section" id="what-you-can-check">
+          <div className="feature-copy">
+            <span className="section-eyebrow">MORE THAN A QUICK LOOK</span>
+            <h2>
+              Remember the things
+              <br />
+              that are easy to miss.
+            </h2>
+            <p>
+              When you’re viewing a place, there’s a lot to take in. Use a
+              guided checklist to give each part of the decision some attention.
+            </p>
+            <ul className="feature-list">
+              <li>
+                <CheckCircle2 size={18} />
+                <span>
+                  <b>Building and utilities</b>
+                  <small>
+                    Visible cracks, damp, water flow, drainage, sockets, and
+                    ventilation.
+                  </small>
+                </span>
+              </li>
+              <li>
+                <CheckCircle2 size={18} />
+                <span>
+                  <b>Surroundings and daily life</b>
+                  <small>
+                    Noise, mobile reception, access roads, and signs of poor
+                    drainage.
+                  </small>
+                </span>
+              </li>
+              <li>
+                <CheckCircle2 size={18} />
+                <span>
+                  <b>Questions before payment</b>
+                  <small>
+                    Fees, tenancy terms, repair promises, receipts, and who
+                    receives payment.
+                  </small>
+                </span>
+              </li>
+            </ul>
+            <a className="site-text-link" href="/inspection-checklist">
+              Explore the inspection checklist <ArrowRight size={16} />
+            </a>
+          </div>
+          <div className="checklist-mockup">
+            <div className="mockup-top">
+              <div>
+                <span className="mockup-kicker">PROPERTY INSPECTION</span>
+                <h3>Viewing checklist</h3>
+              </div>
+              <span className="mockup-count">01 / 04</span>
+            </div>
+            <div className="mockup-progress">
+              <span />
+            </div>
+            <p className="mockup-progress-label">
+              A few checks to guide your walkthrough
+            </p>
+            <div className="mock-check">
+              <span className="mock-check-icon">
+                <House size={17} />
+              </span>
+              <div>
+                <b>Visible cracks or damp</b>
+                <small>Look at corners, ceilings and window edges.</small>
+              </div>
+              <span className="mock-status">Check</span>
+            </div>
+            <div className="mock-check">
+              <span className="mock-check-icon">
+                <Wallet size={17} />
+              </span>
+              <div>
+                <b>Water supply and pressure</b>
+                <small>Run taps and ask how reliable it is.</small>
+              </div>
+              <span className="mock-status">Check</span>
+            </div>
+            <div className="mock-check">
+              <span className="mock-check-icon">
+                <ShieldCheck size={17} />
+              </span>
+              <div>
+                <b>Fees and payment details</b>
+                <small>Request a written breakdown before paying.</small>
+              </div>
+              <span className="mock-status">Ask</span>
+            </div>
+            <div className="mockup-bottom">
+              <span>
+                <CircleHelp size={16} /> Unknown is not the same as okay.
+              </span>
+              <ArrowRight size={17} />
+            </div>
+          </div>
+        </section>
+        <section className="example-section">
+          <div className="example-heading">
+            <div>
+              <span className="section-eyebrow">A REALISTIC EXAMPLE</span>
+              <h2>One shortlist. A better comparison.</h2>
+            </div>
+            <p>
+              Imagine you’re choosing between two places. Put the details side
+              by side instead of relying on memory alone.
+            </p>
+          </div>
+          <div className="example-comparison">
+            <div className="example-property">
+              <div className="example-property-art example-art-one">
+                <div className="example-mini-house">
+                  <i />
+                  <b />
+                  <span />
+                </div>
+                <span className="example-tag">OPTION A</span>
+              </div>
+              <div className="example-property-body">
+                <span className="example-area">
+                  <MapPin size={14} /> Yaba, Lagos
+                </span>
+                <h3>Flat near the main road</h3>
+                <div className="example-price">
+                  ₦1,800,000 <small>/ year</small>
+                </div>
+                <div className="example-detail">
+                  <span>Upfront fees</span>
+                  <b>₦260,000</b>
+                </div>
+                <div className="example-detail">
+                  <span>Follow-up questions</span>
+                  <b>3 to resolve</b>
+                </div>
+                <div className="example-property-note">
+                  <span className="example-note-dot note-dot-amber" /> Ask about
+                  road noise and the extra fees.
+                </div>
+              </div>
+            </div>
+            <div className="example-property">
+              <div className="example-property-art example-art-two">
+                <div className="example-mini-house">
+                  <i />
+                  <b />
+                  <span />
+                </div>
+                <span className="example-tag">OPTION B</span>
+              </div>
+              <div className="example-property-body">
+                <span className="example-area">
+                  <MapPin size={14} /> Surulere, Lagos
+                </span>
+                <h3>Quiet street apartment</h3>
+                <div className="example-price">
+                  ₦2,100,000 <small>/ year</small>
+                </div>
+                <div className="example-detail">
+                  <span>Upfront fees</span>
+                  <b>₦150,000</b>
+                </div>
+                <div className="example-detail">
+                  <span>Follow-up questions</span>
+                  <b>1 to resolve</b>
+                </div>
+                <div className="example-property-note">
+                  <span className="example-note-dot note-dot-green" /> Confirm
+                  the repair timeline in writing.
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="example-disclaimer">
+            Illustrative example only. These are sample figures, not current
+            property listings or market prices.
+          </p>
+        </section>
+        <section className="questions-section" id="questions">
+          <div>
+            <span className="section-eyebrow">GOOD TO KNOW</span>
+            <h2>Questions, answered.</h2>
+            <p>Clear expectations make for better decisions.</p>
+          </div>
+          <div className="faq-list">
+            <details>
+              <summary>Does Before you rent find properties for me?</summary>
+              <p>
+                No. It helps you assess and compare places you’ve already found.
+                It is not a property marketplace or agent directory.
+              </p>
+            </details>
+            <details>
+              <summary>
+                Does it verify a landlord or certify a property as safe?
+              </summary>
+              <p>
+                No. It helps you organise observations and questions. It cannot
+                verify identity, ownership, authority to rent, or hidden
+                building defects.
+              </p>
+            </details>
+            <details>
+              <summary>What costs can I record?</summary>
+              <p>
+                You can record rent, one-off fees, refundable deposits, and
+                recurring charges so the upfront and ongoing costs are easier to
+                review.
+              </p>
+            </details>
+            <details>
+              <summary>Can I compare more than one property?</summary>
+              <p>
+                Yes. Add multiple properties, record what you learn about each
+                one, and open the comparison view in the app.
+              </p>
+            </details>
+            <details>
+              <summary>Where is my information stored?</summary>
+              <p>
+                Your working records are saved in this browser. You can
+                optionally create a private cloud backup after signing in, then
+                restore that snapshot on another device. Cloud backup is a
+                manual snapshot, not live sync, and is available only when the
+                service is configured. You can also export a JSON backup at any
+                time.
+              </p>
+            </details>
+          </div>
+        </section>
+        <section className="closing-cta">
+          <div className="closing-cta-art">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>
+            <span className="section-eyebrow">YOUR NEXT VIEWING</span>
+            <h2>Go in with better questions.</h2>
+            <p>Make room to notice the details before you make a commitment.</p>
+            <a
+              className="site-button site-button-light"
+              href="/app?start=property"
+            >
+              Start your shortlist <ArrowRight size={17} />
+            </a>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
 }
 
 function ChecklistPage() {
- const [responses, setResponses] = useState<Record<string, 'checked' | 'concern'>>({});
- const items = CHECKLIST.flatMap(section => section.items);
- const answered = Object.keys(responses).length;
- const concerns = Object.values(responses).filter(value => value === 'concern').length;
- function setResponse(id: string, status: 'checked' | 'concern') {
-  setResponses(current => {
-   const next = { ...current };
-   if (next[id] === status) delete next[id]; else next[id] = status;
-   return next;
-  });
- }
- return <><SiteHeader/><main className="checklist-page">
-  <a className="legal-back" href="/"><ArrowRight size={15}/> Back to home</a>
-  <section className="checklist-page-hero"><span className="section-eyebrow">YOUR VIEWING COMPANION</span><h1>A checklist for looking <em>a little closer.</em></h1><p>Work through the property one section at a time. Mark what you have checked, flag what needs follow-up, and leave anything you could not verify unanswered.</p><div className="checklist-page-actions"><a className="site-button site-button-primary" href="/app?start=property">Save this to a property <ArrowRight size={17}/></a><span>16 practical checks · No safety score</span></div></section>
-  <section className="checklist-live-summary"><div><span>CHECKS RECORDED</span><strong>{answered} <small>of {items.length}</small></strong></div><div><span>NEEDS FOLLOW-UP</span><strong className="checklist-concern-total">{concerns}</strong></div><div className="checklist-live-progress"><div className="mockup-progress"><span style={{width:(answered/items.length*100)+'%'}}/></div><p>{answered === items.length ? 'You have responded to every item. Review your concerns before deciding.' : 'Your progress updates as you mark each item.'}</p></div><button className="checklist-reset" onClick={()=>setResponses({})} disabled={!answered}>Reset</button></section>
-  <div className="checklist-page-notice"><CircleHelp size={19}/><p><b>Not checked is not the same as okay.</b> This checklist helps organise your observations. It cannot identify hidden defects, verify ownership, or certify a property as safe.</p></div>
-  <div className="checklist-page-sections">{CHECKLIST.map((section,index)=>{const sectionAnswered=section.items.filter(item=>responses[item.id]).length;return <section className="checklist-page-section" key={section.section}><div className="checklist-page-section-head"><span>{String(index+1).padStart(2,'0')}</span><div><h2>{section.section}</h2><p>{sectionAnswered} of {section.items.length} responded</p></div></div><div className="checklist-page-items">{section.items.map(item=>{const response=responses[item.id];return <article className={'checklist-page-item '+(response==='checked'?'item-is-checked':response==='concern'?'item-is-concern':'')} key={item.id}><div className="checklist-page-item-copy"><h3>{item.label}</h3><p>{item.help}</p></div><div className="checklist-page-item-actions"><button className={response==='checked'?'picked-check':''} aria-pressed={response==='checked'} onClick={()=>setResponse(item.id,'checked')}><Check size={15}/> Checked</button><button className={response==='concern'?'picked-concern':''} aria-pressed={response==='concern'} onClick={()=>setResponse(item.id,'concern')}><CircleHelp size={15}/> Follow up</button></div></article>})}</div></section>})}</div>
-  <section className="checklist-page-end"><div><span className="section-eyebrow">WHEN YOU’RE DONE</span><h2>Keep the details with the property.</h2><p>Create a property record to save your responses alongside photos, costs, and questions. This quick checklist page is a working walkthrough; its selections are not saved to a property.</p></div><a className="site-button site-button-primary" href="/app?start=property">Start with a property <ArrowRight size={17}/></a></section>
- </main><SiteFooter/></>;
+  const [responses, setResponses] = useState<
+    Record<string, "checked" | "concern">
+  >({});
+  const items = CHECKLIST.flatMap((section) => section.items);
+  const answered = Object.keys(responses).length;
+  const concerns = Object.values(responses).filter(
+    (value) => value === "concern",
+  ).length;
+  function setResponse(id: string, status: "checked" | "concern") {
+    setResponses((current) => {
+      const next = { ...current };
+      if (next[id] === status) delete next[id];
+      else next[id] = status;
+      return next;
+    });
+  }
+  return (
+    <>
+      <SiteHeader />
+      <main className="checklist-page">
+        <a className="legal-back" href="/">
+          <ArrowRight size={15} /> Back to home
+        </a>
+        <section className="checklist-page-hero">
+          <span className="section-eyebrow">YOUR VIEWING COMPANION</span>
+          <h1>
+            A checklist for looking <em>a little closer.</em>
+          </h1>
+          <p>
+            Work through the property one section at a time. Mark what you have
+            checked, flag what needs follow-up, and leave anything you could not
+            verify unanswered.
+          </p>
+          <div className="checklist-page-actions">
+            <a
+              className="site-button site-button-primary"
+              href="/app?start=property"
+            >
+              Save this to a property <ArrowRight size={17} />
+            </a>
+            <span>16 practical checks · No safety score</span>
+          </div>
+        </section>
+        <section className="checklist-live-summary">
+          <div>
+            <span>CHECKS RECORDED</span>
+            <strong>
+              {answered} <small>of {items.length}</small>
+            </strong>
+          </div>
+          <div>
+            <span>NEEDS FOLLOW-UP</span>
+            <strong className="checklist-concern-total">{concerns}</strong>
+          </div>
+          <div className="checklist-live-progress">
+            <div className="mockup-progress">
+              <span style={{ width: (answered / items.length) * 100 + "%" }} />
+            </div>
+            <p>
+              {answered === items.length
+                ? "You have responded to every item. Review your concerns before deciding."
+                : "Your progress updates as you mark each item."}
+            </p>
+          </div>
+          <button
+            className="checklist-reset"
+            onClick={() => setResponses({})}
+            disabled={!answered}
+          >
+            Reset
+          </button>
+        </section>
+        <div className="checklist-page-notice">
+          <CircleHelp size={19} />
+          <p>
+            <b>Not checked is not the same as okay.</b> This checklist helps
+            organise your observations. It cannot identify hidden defects,
+            verify ownership, or certify a property as safe.
+          </p>
+        </div>
+        <div className="checklist-page-sections">
+          {CHECKLIST.map((section, index) => {
+            const sectionAnswered = section.items.filter(
+              (item) => responses[item.id],
+            ).length;
+            return (
+              <section className="checklist-page-section" key={section.section}>
+                <div className="checklist-page-section-head">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h2>{section.section}</h2>
+                    <p>
+                      {sectionAnswered} of {section.items.length} responded
+                    </p>
+                  </div>
+                </div>
+                <div className="checklist-page-items">
+                  {section.items.map((item) => {
+                    const response = responses[item.id];
+                    return (
+                      <article
+                        className={
+                          "checklist-page-item " +
+                          (response === "checked"
+                            ? "item-is-checked"
+                            : response === "concern"
+                              ? "item-is-concern"
+                              : "")
+                        }
+                        key={item.id}
+                      >
+                        <div className="checklist-page-item-copy">
+                          <h3>{item.label}</h3>
+                          <p>{item.help}</p>
+                        </div>
+                        <div className="checklist-page-item-actions">
+                          <button
+                            className={
+                              response === "checked" ? "picked-check" : ""
+                            }
+                            aria-pressed={response === "checked"}
+                            onClick={() => setResponse(item.id, "checked")}
+                          >
+                            <Check size={15} /> Checked
+                          </button>
+                          <button
+                            className={
+                              response === "concern" ? "picked-concern" : ""
+                            }
+                            aria-pressed={response === "concern"}
+                            onClick={() => setResponse(item.id, "concern")}
+                          >
+                            <CircleHelp size={15} /> Follow up
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+        <section className="checklist-page-end">
+          <div>
+            <span className="section-eyebrow">WHEN YOU’RE DONE</span>
+            <h2>Keep the details with the property.</h2>
+            <p>
+              Create a property record to save your responses alongside photos,
+              costs, and questions. This quick checklist page is a working
+              walkthrough; its selections are not saved to a property.
+            </p>
+          </div>
+          <a
+            className="site-button site-button-primary"
+            href="/app?start=property"
+          >
+            Start with a property <ArrowRight size={17} />
+          </a>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
 }
 
-function LegalPage({path}:{path:string}) {
- const privacy = path === '/privacy';
- const terms = path === '/terms';
- const title = privacy ? 'Privacy policy' : terms ? 'Terms of use' : 'Contact';
- return <><SiteHeader/><main className="legal-page"><a className="legal-back" href="/"><ArrowRight size={15}/> Back to home</a><span className="section-eyebrow">BEFORE YOU RENT</span><h1>{title}</h1><p className="legal-updated">Last updated: 10 October 2026</p>
- {privacy ? <><p className="legal-lead">This page explains how the current version of Before you rent handles information you enter into the app.</p><h2>Information you enter</h2><p>You may enter property names and addresses, rent and fee details, inspection responses, notes, questions, and photos. These records are stored in your browser on the device you are using.</p><h2>Local storage and backups</h2><p>The app uses browser storage to keep your records between visits. The app keeps a working copy in your browser and does not require an account for local use. If optional cloud backup is enabled, you may create an account and explicitly upload a snapshot of your records to a private Amazon S3 bucket. The cloud copy is not live sync; you must upload a new snapshot to update it and restore it separately on another device. Other people who can access your browser profile may be able to access local records there. Clearing browser data, browser failures, or losing access to a device may result in local data loss.</p><p>If you export a backup, the downloaded JSON file may contain personal notes, property details, and photo evidence. Keep it somewhere private. If you import a backup, its contents are added to or overwrite matching records in the current browser as described in the app.</p><h2>Third-party services and technical data</h2><p>The website loads fonts from Google Fonts, so your browser connects to that service to retrieve font files. The site is hosted through Vercel. The hosting provider may process technical request data such as IP address, browser details, request time, and security or diagnostic logs. The app does not include an analytics SDK. If you choose to use cloud backup when available, account authentication is handled by Amazon Cognito and your backup file is stored in a private Amazon S3 bucket. The cloud service receives the property records and photos included in the snapshot; use it only if you are comfortable storing that information with the service.</p><h2>Your choices</h2><p>You can choose what to record, export a copy, avoid adding sensitive information, and manage browser data through your browser settings. You can sign out, delete the cloud backup separately, or delete local records from the workspace. Deleting one copy does not delete the other. Use a device and browser profile you trust.</p><h2>Privacy rights and concerns</h2><p>Depending on applicable law and the circumstances, you may have rights to request information about processing and to seek access, correction, deletion, restriction, or objection. You can manage the property records saved in your browser through the app, including exporting a backup or deleting all local records. For questions about website-level data, contact us using the details below. You can also find information about data protection rights through the <a href="https://ndpc.gov.ng/" target="_blank" rel="noreferrer">Nigeria Data Protection Commission</a>.</p><h2>Changes and contact</h2><p>This policy may change as the product develops. It is a plain-language product notice, not a legal opinion or a certification of compliance. It should be reviewed by a qualified Nigerian privacy professional before launch. For questions about this policy, contact <a href={'mailto:'+email}>{email}</a>.</p></> : terms ? <><p className="legal-lead">Before you rent is a decision-support tool for people considering residential rentals. By using it, you agree to these terms.</p><h2>Informational use only</h2><p>The app helps you organise observations, questions, evidence, and cost estimates. It does not provide property inspection, engineering, legal, financial, or real-estate agency services.</p><h2>No verification or guarantee</h2><p>The app does not verify landlords, agents, ownership, authority to rent, documents, payment recipients, or property safety. A checklist response is based on your own observations and is not a professional assessment. The absence of a recorded concern does not mean a property is safe or suitable.</p><h2>Your decisions and records</h2><p>You are responsible for checking information independently, seeking qualified advice when appropriate, and deciding whether to proceed with a rental. You are responsible for the accuracy of the records you enter and for keeping exported files and any optional cloud backup secure. A cloud backup is a manual snapshot, not live synchronisation; you must upload updated snapshots yourself. Deleting local records does not delete a cloud backup, and deleting a cloud backup does not delete local records.</p><h2>Availability and limitations</h2><p>The app is provided on an “as available” basis. Features may change, and local browser data may be lost due to device, browser, or storage issues. Do not rely on the app as the only copy of important information.</p><h2>Acceptable use</h2><p>Do not use the app unlawfully or to store information you do not have permission to collect. These terms may be updated as the product develops.</p><h2>Contact</h2><p>Questions about these terms can be sent to <a href={'mailto:'+email}>{email}</a>.</p></> : <><p className="legal-lead">Questions, feedback, or something you think would make a rental viewing easier to navigate?</p><p>For product questions and feedback, email <a href={'mailto:'+email}>{email}</a>.</p><p>Before you rent is currently a decision-support tool. It does not provide property verification, legal advice, or professional building inspections.</p><div className="contact-cta"><a className="site-button site-button-primary" href={'mailto:'+email}>Send an email <ArrowRight size={17}/></a><a className="site-text-link" href="/app?start=property">Start an inspection <ArrowRight size={16}/></a></div></>}
- </main><SiteFooter/></>;
+function LegalPage({ path }: { path: string }) {
+  const privacy = path === "/privacy";
+  const terms = path === "/terms";
+  const title = privacy ? "Privacy policy" : terms ? "Terms of use" : "Contact";
+  return (
+    <>
+      <SiteHeader />
+      <main className="legal-page">
+        <a className="legal-back" href="/">
+          <ArrowRight size={15} /> Back to home
+        </a>
+        <span className="section-eyebrow">BEFORE YOU RENT</span>
+        <h1>{title}</h1>
+        <p className="legal-updated">Last updated: 11 October 2026</p>
+        {privacy ? (
+          <>
+            <p className="legal-lead">
+              This page explains how the current version of Before you rent
+              handles information you enter into the app.
+            </p>
+            <h2>Information you enter</h2>
+            <p>
+              You may enter property names and addresses, rent and fee details,
+              inspection responses, notes, questions, and photos. These records
+              are stored in your browser on the device you are using.
+            </p>
+            <h2>Local storage and backups</h2>
+            <p>
+              The app uses browser storage to keep your records between visits.
+              The app keeps a working copy in your browser and does not require
+              an account for local use. If optional cloud backup is enabled, you
+              may create an account and explicitly upload a snapshot of your
+              records to a private Amazon S3 bucket. The cloud copy is not live
+              sync; you must upload a new snapshot to update it and restore it
+              separately on another device. Other people who can access your
+              browser profile may be able to access local records there.
+              Clearing browser data, browser failures, or losing access to a
+              device may result in local data loss.
+            </p>
+            <p>
+              If you export a backup, the downloaded JSON file may contain
+              personal notes, property details, and photo evidence. Keep it
+              somewhere private. If you import a backup, its contents are added
+              to or overwrite matching records in the current browser as
+              described in the app.
+            </p>
+            <h2>Third-party services and technical data</h2>
+            <p>
+              The website loads fonts from Google Fonts, so your browser
+              connects to that service to retrieve font files. The site is
+              hosted through Vercel. The hosting provider may process technical
+              request data such as IP address, browser details, request time,
+              and security or diagnostic logs. The app does not include an
+              analytics SDK. If you choose to use cloud backup when available,
+              account authentication is handled by Amazon Cognito and your
+              backup file is stored in a private Amazon S3 bucket. The cloud
+              service receives the property records and photos included in the
+              snapshot; use it only if you are comfortable storing that
+              information with the service.
+            </p>
+            <h2>Your choices</h2>
+            <p>
+              You can choose what to record, export a copy, avoid adding
+              sensitive information, and manage browser data through your
+              browser settings. You can sign out, delete the cloud backup
+              separately, or delete local records from the workspace. Deleting
+              one copy does not delete the other. Use a device and browser
+              profile you trust.
+            </p>
+            <h2>Privacy rights and concerns</h2>
+            <p>
+              Depending on applicable law and the circumstances, you may have
+              rights to request information about processing and to seek access,
+              correction, deletion, restriction, or objection. You can manage
+              the property records saved in your browser through the app,
+              including exporting a backup or deleting all local records. For
+              questions about website-level data, contact us using the details
+              below. You can also find information about data protection rights
+              through the{" "}
+              <a href="https://ndpc.gov.ng/" target="_blank" rel="noreferrer">
+                Nigeria Data Protection Commission
+              </a>
+              .
+            </p>
+            <h2>Changes and contact</h2>
+            <p>
+              This policy may change as the product develops. It is a
+              plain-language description of how the app works, not legal advice
+              and not a statement that the product meets any specific data
+              protection law. For questions about this policy, contact{" "}
+              <a href={"mailto:" + email}>{email}</a>.
+            </p>
+          </>
+        ) : terms ? (
+          <>
+            <p className="legal-lead">
+              Before you rent is a decision-support tool for people considering
+              residential rentals. By using it, you agree to these terms.
+            </p>
+            <h2>Informational use only</h2>
+            <p>
+              The app helps you organise observations, questions, evidence, and
+              cost estimates. It does not provide property inspection,
+              engineering, legal, financial, or real-estate agency services.
+            </p>
+            <h2>No verification or guarantee</h2>
+            <p>
+              The app does not verify landlords, agents, ownership, authority to
+              rent, documents, payment recipients, or property safety. A
+              checklist response is based on your own observations and is not a
+              professional assessment. The absence of a recorded concern does
+              not mean a property is safe or suitable.
+            </p>
+            <h2>Your decisions and records</h2>
+            <p>
+              You are responsible for checking information independently,
+              seeking qualified advice when appropriate, and deciding whether to
+              proceed with a rental. You are responsible for the accuracy of the
+              records you enter and for keeping exported files and any optional
+              cloud backup secure. A cloud backup is a manual snapshot, not live
+              synchronisation; you must upload updated snapshots yourself.
+              Deleting local records does not delete a cloud backup, and
+              deleting a cloud backup does not delete local records.
+            </p>
+            <h2>Availability and limitations</h2>
+            <p>
+              The app is provided on an “as available” basis. Features may
+              change, and local browser data may be lost due to device, browser,
+              or storage issues. Do not rely on the app as the only copy of
+              important information.
+            </p>
+            <h2>Acceptable use</h2>
+            <p>
+              Do not use the app unlawfully or to store information you do not
+              have permission to collect. These terms may be updated as the
+              product develops.
+            </p>
+            <h2>Contact</h2>
+            <p>
+              Questions about these terms can be sent to{" "}
+              <a href={"mailto:" + email}>{email}</a>.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="legal-lead">
+              Questions, feedback, or something you think would make a rental
+              viewing easier to navigate?
+            </p>
+            <p>
+              For product questions and feedback, email{" "}
+              <a href={"mailto:" + email}>{email}</a>.
+            </p>
+            <p>
+              Before you rent is currently a decision-support tool. It does not
+              provide property verification, legal advice, or professional
+              building inspections.
+            </p>
+            <div className="contact-cta">
+              <a
+                className="site-button site-button-primary"
+                href={"mailto:" + email}
+              >
+                Send an email <ArrowRight size={17} />
+              </a>
+              <a className="site-text-link" href="/app?start=property">
+                Start an inspection <ArrowRight size={16} />
+              </a>
+            </div>
+          </>
+        )}
+      </main>
+      <SiteFooter />
+    </>
+  );
 }
-export default function MarketingSite({path}:Props) {
- if (path === '/app' || path.startsWith('/app/')) return <div/>;
- if (path === '/inspection-checklist') return <ChecklistPage />;
- if (path === '/privacy' || path === '/terms' || path === '/contact') return <LegalPage path={path}/>;
- return <Landing/>;
+export default function MarketingSite({ path }: Props) {
+  if (path === "/app" || path.startsWith("/app/")) return <div />;
+  if (path === "/inspection-checklist") return <ChecklistPage />;
+  if (path === "/privacy" || path === "/terms" || path === "/contact")
+    return <LegalPage path={path} />;
+  return <Landing />;
 }
