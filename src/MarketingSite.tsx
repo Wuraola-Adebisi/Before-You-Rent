@@ -18,7 +18,7 @@ import { useState } from "react";
 import { CHECKLIST } from "./types";
 
 type Props = { path: string };
-const email = "the.wuraola.adebisi@gmail.com";
+const contactPlaceholder = "Contact details will be added here.";
 
 function Brand() {
   return (
@@ -356,82 +356,38 @@ function Landing() {
         <section className="example-section">
           <div className="example-heading">
             <div>
-              <span className="section-eyebrow">A REALISTIC EXAMPLE</span>
-              <h2>One shortlist. A better comparison.</h2>
+              <span className="section-eyebrow">A CLEARER PICTURE</span>
+              <h2>Compare more than the rent.</h2>
             </div>
             <p>
-              Imagine you’re choosing between two places. Put the details side
-              by side instead of relying on memory alone.
+              Bring the details together before you decide. Review what each
+              property costs, what you noticed during the viewing, and what
+              still needs an answer.
             </p>
           </div>
-          <div className="example-comparison">
-            <div className="example-property">
-              <div className="example-property-art example-art-one">
-                <div className="example-mini-house">
-                  <i />
-                  <b />
-                  <span />
-                </div>
-                <span className="example-tag">OPTION A</span>
-              </div>
-              <div className="example-property-body">
-                <span className="example-area">
-                  <MapPin size={14} /> Yaba, Lagos
-                </span>
-                <h3>Flat near the main road</h3>
-                <div className="example-price">
-                  ₦1,800,000 <small>/ year</small>
-                </div>
-                <div className="example-detail">
-                  <span>Upfront fees</span>
-                  <b>₦260,000</b>
-                </div>
-                <div className="example-detail">
-                  <span>Follow-up questions</span>
-                  <b>3 to resolve</b>
-                </div>
-                <div className="example-property-note">
-                  <span className="example-note-dot note-dot-amber" /> Ask about
-                  road noise and the extra fees.
-                </div>
-              </div>
-            </div>
-            <div className="example-property">
-              <div className="example-property-art example-art-two">
-                <div className="example-mini-house">
-                  <i />
-                  <b />
-                  <span />
-                </div>
-                <span className="example-tag">OPTION B</span>
-              </div>
-              <div className="example-property-body">
-                <span className="example-area">
-                  <MapPin size={14} /> Surulere, Lagos
-                </span>
-                <h3>Quiet street apartment</h3>
-                <div className="example-price">
-                  ₦2,100,000 <small>/ year</small>
-                </div>
-                <div className="example-detail">
-                  <span>Upfront fees</span>
-                  <b>₦150,000</b>
-                </div>
-                <div className="example-detail">
-                  <span>Follow-up questions</span>
-                  <b>1 to resolve</b>
-                </div>
-                <div className="example-property-note">
-                  <span className="example-note-dot note-dot-green" /> Confirm
-                  the repair timeline in writing.
-                </div>
-              </div>
-            </div>
+          <div className="steps-grid">
+            <article className="step-card">
+              <span className="step-number">01</span>
+              <div className="step-icon step-icon-green"><Wallet size={23} /></div>
+              <h3>Upfront and ongoing costs</h3>
+              <p>Review rent, deposits, agency and other fees, plus recurring charges.</p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">02</span>
+              <div className="step-icon step-icon-peach"><ClipboardCheck size={23} /></div>
+              <h3>What you observed</h3>
+              <p>Keep inspection responses and photo evidence alongside each property.</p>
+              <span className="step-line" />
+            </article>
+            <article className="step-card">
+              <span className="step-number">03</span>
+              <div className="step-icon step-icon-lilac"><CircleHelp size={23} /></div>
+              <h3>Questions still open</h3>
+              <p>See which details need clarification before you make a commitment.</p>
+              <span className="step-line" />
+            </article>
           </div>
-          <p className="example-disclaimer">
-            Illustrative example only. These are sample figures, not current
-            property listings or market prices.
-          </p>
         </section>
         <section className="questions-section" id="questions">
           <div>
@@ -765,8 +721,7 @@ function LegalPage({ path }: { path: string }) {
               This policy may change as the product develops. It is a
               plain-language description of how the app works, not legal advice
               and not a statement that the product meets any specific data
-              protection law. For questions about this policy, contact{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              protection law. For questions about this policy, {contactPlaceholder.toLowerCase()}.
             </p>
           </>
         ) : terms ? (
@@ -815,8 +770,7 @@ function LegalPage({ path }: { path: string }) {
             </p>
             <h2>Contact</h2>
             <p>
-              Questions about these terms can be sent to{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {contactPlaceholder}
             </p>
           </>
         ) : (
@@ -826,8 +780,7 @@ function LegalPage({ path }: { path: string }) {
               viewing easier to navigate?
             </p>
             <p>
-              For product questions and feedback, email{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {contactPlaceholder}
             </p>
             <p>
               Before you rent is currently a decision-support tool. It does not
@@ -835,14 +788,8 @@ function LegalPage({ path }: { path: string }) {
               building inspections.
             </p>
             <div className="contact-cta">
-              <a
-                className="site-button site-button-primary"
-                href={"mailto:" + email}
-              >
-                Send an email <ArrowRight size={17} />
-              </a>
-              <a className="site-text-link" href="/app?start=property">
-                Start an inspection <ArrowRight size={16} />
+              <a className="site-button site-button-primary" href="/app?start=property">
+                Start an inspection <ArrowRight size={17} />
               </a>
             </div>
           </>
