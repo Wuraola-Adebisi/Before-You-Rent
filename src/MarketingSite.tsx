@@ -720,7 +720,7 @@ function LegalPage({ path }: { path: string }) {
               plain-language description of how the app works, not legal advice
               and not a statement that the product meets any specific data
               protection law. For questions about this policy, contact{" "}
-              <a href={"mailto:" + email}>{email}</a>.
+              {email}.
             </p>
           </>
         ) : terms ? (
