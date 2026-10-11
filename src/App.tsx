@@ -114,7 +114,7 @@ function WorkspaceApp() {
   async function savePersonalisedChecklist(propertyId: string, checks: PersonalisedCheck[]) {
     const current = properties.find(property => property.id === propertyId);
     if (!current) throw new Error('Choose a property before saving tailored checks.');
-    const merged = new Map((current.personalisedChecklist ?? []).map(check => [check.id, check]));
+    const merged = new Map<string, PersonalisedCheck>((current.personalisedChecklist ?? []).map(check => [check.id, check] as const));
     checks.forEach(check => merged.set(check.id, check));
     const updated: PropertyRecord = { ...current, personalisedChecklist: [...merged.values()], updatedAt: new Date().toISOString() };
     try { await saveProperty(updated); setProperties(previous => previous.map(property => property.id === propertyId ? updated : property)); setToast('Your tailored checks have been added to this inspection.'); window.setTimeout(() => setToast(''), 3000); }
